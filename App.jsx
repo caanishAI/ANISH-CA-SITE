@@ -11,15 +11,18 @@ import portraitImg from "./portrait.webp";
 /* ---------------------------------------------------------------------------
    TOOLS
 
+   Each tool is one self-contained HTML page stored as a .js file that exports
+   it as a string. No folders, no build plugins — the file just sits next to
+   App.jsx like everything else.
+
    TO ADD A NEW TOOL:
    1. Build it as ONE self-contained .html file (styles + script inside it).
-   2. Upload it into the `tools` folder of this repo.
-   3. Add an import line below, exactly like the first one, with ?raw at the end.
-   4. Add one entry to the TOOLS array.
-   Nothing else changes.
+   2. Ask for it to be converted into a toolSomething.js file.
+   3. Upload that .js file to this repo, next to App.jsx.
+   4. Add an import line below + one entry in the TOOLS array.
 --------------------------------------------------------------------------- */
-import toolDaughter from "./tools/investment-for-daughter.html?raw";
-// import toolTwo from "./tools/your-next-tool.html?raw";
+import toolDaughter from "./toolInvestmentDaughter.js";
+// import toolTwo from "./toolYourNextTool.js";
 
 /* ===========================================================================
    CA ANISH CHOUDHARY
