@@ -3,9 +3,23 @@ import {
   Menu, X, ArrowRight, Check, MessageCircle, Phone, Mail, MapPin, Clock,
   Play, Linkedin, Instagram, Youtube, Send, ShieldCheck, FileCheck2, Receipt,
   Building2, Landmark, Calculator, Briefcase, Store, Factory, Home, Cpu, Layers,
-  Users, BadgeCheck, Wallet, Timer, Lock, Headphones,
+  Users, BadgeCheck, Wallet, Timer, Lock, Headphones, Wrench, Maximize2,
+  LineChart as LineChartIcon,
 } from "lucide-react";
 import portraitImg from "./portrait.webp";
+
+/* ---------------------------------------------------------------------------
+   TOOLS
+
+   TO ADD A NEW TOOL:
+   1. Build it as ONE self-contained .html file (styles + script inside it).
+   2. Upload it into the `tools` folder of this repo.
+   3. Add an import line below, exactly like the first one, with ?raw at the end.
+   4. Add one entry to the TOOLS array.
+   Nothing else changes.
+--------------------------------------------------------------------------- */
+import toolDaughter from "./tools/investment-for-daughter.html?raw";
+// import toolTwo from "./tools/your-next-tool.html?raw";
 
 /* ===========================================================================
    CA ANISH CHOUDHARY
@@ -177,12 +191,32 @@ const SERVICES = [
 ];
 
 
+/* ---------------------------------------------------------------------------
+   INSIGHTS — your posts.
+
+   TO ADD A REEL:
+   1. Instagram → open your reel → Share → "Copy link"
+      You get something like: https://www.instagram.com/reel/ABC123xyz/
+   2. Paste it into `url` below and write the real title in `t`.
+
+   TO ADD A COVER IMAGE (optional, looks much better):
+   3. Save the reel's cover as a .jpg (screenshot works), name it reel1.jpg
+   4. Upload it to your repo, next to App.jsx
+   5. Uncomment the import line below and add   img: reel1,   to that item.
+
+   Use only your own images.
+--------------------------------------------------------------------------- */
+// import reel1 from "./reel1.jpg";
+// import reel2 from "./reel2.jpg";
+// import reel3 from "./reel3.jpg";
+
 const INSIGHTS = {
   "Instagram Reels": [
-    { t: "Taxation on Gift", cta: "Watch on Instagram", url: "https://www.instagram.com/reel/DaHSrPBpwz6/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA==" /* , img: reel1.jpg */ },
-    { t: "Taxation on Sale of Shares", cta: "Watch on Instagram", url: "https://www.instagram.com/reel/Dab8IyYxMw6/?igsh=MW9jazYxZmcwOHpkMg==" },
-    { t: "Be Aware of AIS", cta: "Watch on Instagram", url: "https://www.instagram.com/reel/Das3nj6tWjS/?igsh=OHI1bmoxc3A0aWMx" },
+    { t: "Taxation on Gift", cta: "Watch on Instagram", url: "https://www.instagram.com/reel/DaHSrPBpwz6/" /* , img: reel1 */ },
+    { t: "Taxation on Sale of Shares", cta: "Watch on Instagram", url: "https://www.instagram.com/reel/Dab8IyYxMw6/" /* , img: reel2 */ },
+    { t: "Be Aware of AIS", cta: "Watch on Instagram", url: "https://www.instagram.com/reel/Das3nj6tWjS/" /* , img: reel3 */ },
   ],
+
   YouTube: [
     { t: "Add your video title", cta: "Watch on YouTube", url: "#" },
     { t: "Add your video title", cta: "Watch on YouTube", url: "#" },
@@ -202,6 +236,35 @@ const PROMISES = [
   { i: Headphones, t: "Dedicated Support" },
 ];
 
+const TOOLS = [
+  {
+    id: "daughter",
+    icon: LineChartIcon,
+    tag: "Planning",
+    t: "Investment Planner for a Daughter",
+    d: "Work out what a monthly SIP or a lump sum could become by the age you need it — and what that corpus is actually worth after inflation and tax on exit.",
+    points: ["SIP or lump sum modelling", "Glide path by age", "Inflation-adjusted value", "Tax on exit at current slabs"],
+    html: toolDaughter,
+  },
+  // {
+  //   id: "next", icon: Calculator, tag: "Tax",
+  //   t: "Your next tool",
+  //   d: "One line describing what it answers.",
+  //   points: ["Point one", "Point two"],
+  //   html: toolTwo,
+  // },
+];
+
+/* Social links — set to "#" to hide that icon automatically. */
+const SOCIALS = [
+  [Linkedin, "https://www.linkedin.com/in/anish-choudhary-764956133", "LinkedIn"],
+  [Instagram, "https://www.instagram.com/anish.simplekar", "Instagram"],
+  [Youtube, "#", "YouTube"],
+];
+
+/* Tabs with no real links yet are hidden automatically. */
+const INSIGHT_TABS = Object.keys(INSIGHTS).filter((k) => INSIGHTS[k].some((p) => p.url && p.url !== "#"));
+
 const GOLD = "#E5A94E";
 
 function Reveal({ children, delay = 0, className = "" }) {
@@ -218,15 +281,23 @@ function Reveal({ children, delay = 0, className = "" }) {
 export default function Site() {
   const [menu, setMenu] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [tab, setTab] = useState("Instagram Reels");
+  const [tab, setTab] = useState(INSIGHT_TABS[0] || "");
   const [form, setForm] = useState({ name: "", email: "", phone: "", service: "", message: "" });
   const [status, setStatus] = useState("idle");
+  const [openTool, setOpenTool] = useState(null);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 12);
     window.addEventListener("scroll", onScroll, { passive: true }); onScroll();
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
+
+  useEffect(() => {
+    document.body.style.overflow = openTool ? "hidden" : "";
+    const onKey = (e) => { if (e.key === "Escape") setOpenTool(null); };
+    window.addEventListener("keydown", onKey);
+    return () => { document.body.style.overflow = ""; window.removeEventListener("keydown", onKey); };
+  }, [openTool]);
 
   const go = (id) => { document.getElementById(id)?.scrollIntoView({ behavior: "smooth" }); setMenu(false); };
   const setF = (k, v) => setForm((f) => ({ ...f, [k]: v }));
@@ -247,7 +318,7 @@ export default function Site() {
     } catch { setStatus("error"); }
   };
 
-  const nav = [["Home", "top"], ["About", "about"], ["Services", "services"], ["Insights", "insights"], ["Contact", "contact"]];
+  const nav = [["Home", "top"], ["About", "about"], ["Services", "services"], ["Tools", "tools"], ["Insights", "insights"], ["Contact", "contact"]];
 
   return (
     <div className="site">
@@ -403,6 +474,20 @@ export default function Site() {
         .fade-edge{ position:absolute; inset:0; pointer-events:none;
           background:radial-gradient(ellipse 94% 84% at 50% 44%, transparent 42%, rgba(10,10,12,.94) 100%); }
 
+        .tool-overlay{ position:fixed; inset:0; z-index:120; display:flex; align-items:center; justify-content:center;
+          padding:16px; background:rgba(6,6,8,.82); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
+          animation:fadeIn .3s var(--e) both; }
+        @keyframes fadeIn{ from{opacity:0;} to{opacity:1;} }
+        .tool-shell{ width:100%; max-width:900px; height:min(92vh,980px); display:flex; flex-direction:column;
+          background:#0E0E11; border:1px solid var(--line-2); border-radius:16px; overflow:hidden;
+          box-shadow:0 40px 90px -40px rgba(0,0,0,1); animation:riseIn .45s var(--e-out) both; }
+        .tool-bar{ display:flex; align-items:center; justify-content:space-between; gap:16px;
+          padding:16px 20px; border-bottom:1px solid var(--line); flex-shrink:0; }
+        .tool-close{ display:inline-flex; align-items:center; justify-content:center; width:36px; height:36px;
+          border-radius:10px; border:1px solid var(--line); color:var(--mute); flex-shrink:0;
+          transition:border-color .35s var(--e), color .35s var(--e); }
+        .tool-close:hover{ border-color:var(--gold-dim); color:var(--gold); }
+        .tool-frame{ flex:1; width:100%; border:0; background:#FAF6EF; }
         .social{ display:inline-flex; align-items:center; justify-content:center; width:38px; height:38px;
           border-radius:10px; border:1px solid var(--line); color:var(--mute);
           transition:border-color .4s var(--e), color .4s var(--e), transform .4s var(--e-out); }
@@ -650,7 +735,78 @@ export default function Site() {
         </div>
       </section>
 
+      {/* ================= TOOLS ================= */}
+      <section id="tools" className="sec rule-b">
+        <div className="wrap">
+          <Reveal><div className="t-eyebrow text-center">Tools</div></Reveal>
+          <Reveal delay={70}>
+            <h2 className="t-h2 text-center" style={{ marginTop: 16 }}>Run the Numbers Yourself.</h2>
+          </Reveal>
+          <Reveal delay={120}>
+            <p className="t-body text-center" style={{ maxWidth: "54ch", margin: "20px auto 0" }}>
+              Calculators I use in my own work, open for anyone to use. They run entirely in your
+              browser — nothing you type is sent anywhere or stored.
+            </p>
+          </Reveal>
+
+          <div className="grid lg:grid-cols-2" style={{ gap: 16, marginTop: 56 }}>
+            {TOOLS.map(({ id, icon: Icon, tag, t, d, points }, idx) => (
+              <Reveal key={id} delay={(idx % 2) * 90}>
+                <button onClick={() => setOpenTool(id)} className="card card-i h-full flex flex-col text-left w-full" style={{ padding: "30px 30px 26px" }}>
+                  <div className="flex items-start justify-between" style={{ gap: 16 }}>
+                    <span className="plate plate-lg" style={{ flexShrink: 0 }}>
+                      <Icon size={19} strokeWidth={1.6} style={{ color: GOLD }} />
+                    </span>
+                    <span className="mono" style={{
+                      fontSize: 9.5, letterSpacing: ".18em", textTransform: "uppercase",
+                      color: "var(--mute)", border: "1px solid var(--line)", borderRadius: 999, padding: "5px 11px",
+                    }}>{tag}</span>
+                  </div>
+
+                  <h3 className="t-h3" style={{ fontSize: "1.125rem", marginTop: 20 }}>{t}</h3>
+                  <p className="t-sm" style={{ marginTop: 10 }}>{d}</p>
+
+                  <ul style={{ marginTop: 20, paddingTop: 18, borderTop: "1px solid var(--line)", display: "grid", gap: 10, flex: 1 }}>
+                    {points.map((pt) => (
+                      <li key={pt} className="flex items-start" style={{ gap: 11 }}>
+                        <span style={{ width: 4, height: 4, borderRadius: "50%", background: GOLD, marginTop: 8, flexShrink: 0, opacity: .8 }} />
+                        <span style={{ fontSize: ".8438rem", lineHeight: 1.55, color: "var(--text-2)" }}>{pt}</span>
+                      </li>
+                    ))}
+                  </ul>
+
+                  <span className="go" style={{ marginTop: 22 }}>
+                    Open tool <Maximize2 size={13} strokeWidth={2} />
+                  </span>
+                </button>
+              </Reveal>
+            ))}
+
+            {/* more coming */}
+            <Reveal delay={(TOOLS.length % 2) * 90}>
+              <div className="h-full flex flex-col items-center justify-center text-center"
+                style={{ border: "1px dashed var(--line-2)", borderRadius: "var(--r-card)", padding: 40, minHeight: 220 }}>
+                <Wrench size={20} strokeWidth={1.5} style={{ color: "var(--mute)" }} />
+                <div className="t-h3" style={{ fontSize: ".9375rem", marginTop: 16, color: "var(--mute)" }}>More tools on the way</div>
+                <p className="t-xs" style={{ marginTop: 8, maxWidth: "30ch" }}>
+                  Tax, GST and compliance calculators are being added as I build them.
+                </p>
+              </div>
+            </Reveal>
+          </div>
+
+          <Reveal>
+            <p className="t-xs text-center" style={{ maxWidth: "70ch", margin: "40px auto 0" }}>
+              These calculators are for general illustration only. Results are indicative, based on the
+              assumptions you enter, and do not constitute professional, investment or tax advice.
+              Please discuss your own situation before acting on any figure shown here.
+            </p>
+          </Reveal>
+        </div>
+      </section>
+
       {/* ================= INSIGHTS ================= */}
+      {INSIGHT_TABS.length > 0 && (
       <section id="insights" className="sec rule-t">
         <div className="wrap">
           <Reveal><div className="t-eyebrow text-center">Latest insights</div></Reveal>
@@ -658,7 +814,7 @@ export default function Site() {
 
           <Reveal delay={130}>
             <div className="flex justify-center" style={{ gap: 10, marginTop: 40 }}>
-              {Object.keys(INSIGHTS).map((k) => {
+              {INSIGHT_TABS.map((k) => {
                 const on = tab === k;
                 return (
                   <button key={k} onClick={() => setTab(k)} className="disp" aria-pressed={on}
@@ -674,15 +830,22 @@ export default function Site() {
           </Reveal>
 
           <div key={tab} className="grid md:grid-cols-3" style={{ gap: 16, marginTop: 44 }}>
-            {INSIGHTS[tab].map((p, i) => (
+            {(INSIGHTS[tab] || []).filter((p) => p.url && p.url !== "#").map((p, i) => (
               <Reveal key={p.t + i} delay={i * 80}>
                 <a href={p.url} target={p.url === "#" ? undefined : "_blank"} rel="noreferrer" className="card card-i block h-full overflow-hidden">
-                  <div className="relative flex items-center" style={{
+                  <div className="relative flex items-center overflow-hidden" style={{
                     height: 194, padding: "0 26px",
                     background: "linear-gradient(146deg, rgba(229,169,78,.115), rgba(255,255,255,.014) 56%, transparent)",
                     borderBottom: "1px solid var(--line)",
                   }}>
-                    <div className="disp" style={{ fontSize: "1.25rem", fontWeight: 700, lineHeight: 1.24, letterSpacing: "-.025em", maxWidth: "76%" }}>{p.t}</div>
+                    {p.img && (
+                      <>
+                        <img src={p.img} alt="" aria-hidden="true" loading="lazy" decoding="async"
+                          style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }} />
+                        <span style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg, rgba(10,10,12,.25), rgba(10,10,12,.85))" }} />
+                      </>
+                    )}
+                    <div className="disp relative" style={{ fontSize: "1.25rem", fontWeight: 700, lineHeight: 1.24, letterSpacing: "-.025em", maxWidth: "76%" }}>{p.t}</div>
                     <span className="absolute inline-flex items-center justify-center" style={{
                       right: 22, bottom: 22, width: 38, height: 38, borderRadius: "50%",
                       background: "rgba(10,10,12,.55)", border: "1px solid rgba(229,169,78,.34)",
@@ -700,6 +863,7 @@ export default function Site() {
           </div>
         </div>
       </section>
+      )}
 
       {/* ================= CTA ================= */}
       <section className="relative overflow-hidden grid-bg rule-t rule-b">
@@ -738,7 +902,7 @@ export default function Site() {
                   ))}
                 </div>
                 <div className="flex" style={{ gap: 10, marginTop: 32, paddingTop: 28, borderTop: "1px solid var(--line)" }}>
-                  {[[Linkedin, "https://www.linkedin.com/in/anish-choudhary-764956133?utm_source=share_via&utm_content=profile&utm_medium=member_ios", "LinkedIn"], [Instagram, "https://www.instagram.com/anish.simplekar?igsh=OXE0cTRuYXBkcjVt&utm_source=qr", "Instagram"], [Youtube, "#", "YouTube"], [MessageCircle, waLink, "WhatsApp"]].map(([Icon, href, label], i) => (
+                  {[...SOCIALS.filter(([, h]) => h !== "#"), [MessageCircle, waLink, "WhatsApp"]].map(([Icon, href, label], i) => (
                     <a key={i} href={href} target="_blank" rel="noreferrer" aria-label={label} className="social">
                       <Icon size={15} strokeWidth={1.7} />
                     </a>
@@ -836,6 +1000,30 @@ export default function Site() {
           </div>
         </div>
       </footer>
+
+      {/* ================= TOOL VIEWER ================= */}
+      {openTool && (() => {
+        const tool = TOOLS.find((x) => x.id === openTool);
+        if (!tool) return null;
+        return (
+          <div className="tool-overlay" role="dialog" aria-modal="true" aria-label={tool.t}
+            onMouseDown={(e) => { if (e.target === e.currentTarget) setOpenTool(null); }}>
+            <div className="tool-shell">
+              <div className="tool-bar">
+                <div style={{ minWidth: 0 }}>
+                  <div className="t-h3" style={{ fontSize: ".9375rem" }}>{tool.t}</div>
+                  <div className="t-xs" style={{ marginTop: 3 }}>Indicative only — not professional advice</div>
+                </div>
+                <button onClick={() => setOpenTool(null)} aria-label="Close tool" className="tool-close">
+                  <X size={17} strokeWidth={1.9} />
+                </button>
+              </div>
+              <iframe title={tool.t} srcDoc={tool.html} className="tool-frame"
+                sandbox="allow-scripts allow-popups allow-forms" loading="lazy" />
+            </div>
+          </div>
+        );
+      })()}
     </div>
   );
 }
