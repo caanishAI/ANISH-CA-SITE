@@ -26,7 +26,7 @@ const FIRM = {
   estYear: "2017",
   city: "Ujjain, Madhya Pradesh, India",
   phone: "+91 88392 22753",
-  email: "anishagrawal533@gmail.com",
+  email: "ca.anishchoudhary@outlook.com",
   hours: "Mon – Sat · 10:00 AM – 6:00 PM",
 };
 
