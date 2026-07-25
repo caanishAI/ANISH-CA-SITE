@@ -738,7 +738,7 @@ export default function Site() {
                   ))}
                 </div>
                 <div className="flex" style={{ gap: 10, marginTop: 32, paddingTop: 28, borderTop: "1px solid var(--line)" }}>
-                  {[[Linkedin, "#", "LinkedIn"], [Instagram, "#", "Instagram"], [Youtube, "#", "YouTube"], [MessageCircle, waLink, "WhatsApp"]].map(([Icon, href, label], i) => (
+                  {[[Linkedin, "https://www.linkedin.com/in/anish-choudhary-764956133?utm_source=share_via&utm_content=profile&utm_medium=member_ios", "LinkedIn"], [Instagram, "https://www.instagram.com/anish.simplekar?igsh=OXE0cTRuYXBkcjVt&utm_source=qr", "Instagram"], [Youtube, "#", "YouTube"], [MessageCircle, waLink, "WhatsApp"]].map(([Icon, href, label], i) => (
                     <a key={i} href={href} target="_blank" rel="noreferrer" aria-label={label} className="social">
                       <Icon size={15} strokeWidth={1.7} />
                     </a>
