@@ -1,512 +1,838 @@
 import { useState, useEffect, useRef } from "react";
-import { Phone, Mail, MapPin, Clock, ArrowUpRight, Menu, X, ShieldCheck, FileCheck2, Receipt, Building2, Landmark, Calculator, Lightbulb, ArrowRight, Globe, Send, MessageCircle } from "lucide-react";
+import {
+  Menu, X, ArrowRight, Check, MessageCircle, Phone, Mail, MapPin, Clock,
+  Play, Linkedin, Instagram, Youtube, Send, ShieldCheck, FileCheck2, Receipt,
+  Building2, Landmark, Calculator, Briefcase, Store, Factory, Home, Cpu, Layers,
+  Users, BadgeCheck, Wallet, Timer, Lock, Headphones,
+} from "lucide-react";
 
-/* =========================================================================
-   NIHAR & ASSOCIATES — Chartered Accountants
-   High-craft, dynamic, and ICAI-compliant. [BRACKET] items = apni detail.
-   Copy is factual & non-solicitous (no "best/guaranteed/free consult/clients count").
-   Verify final content against latest ICAI guidance before publishing.
-   ========================================================================= */
+/* ===========================================================================
+   CA ANISH CHOUDHARY
+
+   ⚠️  BEFORE PUBLISHING
+   1. STATS — every figure must be true and verifiable. Delete what you cannot
+      substantiate. "9+ years" follows from Est. 2017; "500+" and "1000+" are
+      yours to confirm against your records or remove.
+   2. INSIGHTS + social links — replace "#" with your real URLs.
+   3. WEB3FORMS_KEY — free key from web3forms.com so the form reaches your inbox.
+   4. Copy is written to stay factual and non-solicitous. If you add claims,
+      keep them verifiable — ICAI restricts unverifiable or promissory claims.
+   =========================================================================== */
 
 const FIRM = {
-  name: "CA Anish Choudhary", tagline: "Chartered Accountant", estYear: "2017",
-  city: "Ujjain, Madhya Pradesh",
-  phone: "+91 88392 22753", email: "anishagrawal533@gmail.com",
-  availability: "Available online — serving clients across India", hours: "Mon–Sat · 10:00 AM – 6:00 PM",
+  name: "CA Anish Choudhary",
+  short: "Anish Choudhary",
+  estYear: "2017",
+  city: "Ujjain, Madhya Pradesh, India",
+  phone: "+91 88392 22753",
+  email: "anishagrawal533@gmail.com",
+  hours: "Mon – Sat · 10:00 AM – 6:00 PM",
 };
 
-// Contact delivery — WhatsApp works immediately. For direct-to-inbox email, get a free
-// access key at https://web3forms.com and paste it below (messages arrive at your Gmail).
+const WA_NUMBER = "918839222753";
 const WEB3FORMS_KEY = "YOUR_WEB3FORMS_ACCESS_KEY";
-const WA_NUMBER = "918839222753"; // WhatsApp number with country code
 
-const CATS = [
-  { id: "audit", label: "Audit & Assurance", icon: ShieldCheck },
-  { id: "dtax", label: "Direct Tax", icon: FileCheck2 },
-  { id: "gst", label: "GST & Indirect Tax", icon: Receipt },
-  { id: "corp", label: "Company Law", icon: Building2 },
-  { id: "reg", label: "Registrations", icon: Landmark },
-  { id: "acc", label: "Accounting", icon: Calculator },
-  { id: "adv", label: "Advisory", icon: Lightbulb },
+const STATS = [
+  { v: "9+", l: "Years Experience" },
+  { v: "500+", l: "Businesses Served" },
+  { v: "1000+", l: "Returns Filed" },
+  { v: "5+", l: "Industries Served" },
+  { v: "30 Min", l: "Avg. Response Time" },
+];
+
+const INDUSTRIES = [
+  { i: Store, t: "Retail & Trading" },
+  { i: Factory, t: "Manufacturing" },
+  { i: Home, t: "Real Estate" },
+  { i: Cpu, t: "IT & Startups" },
+  { i: Users, t: "Professionals" },
+];
+
+
+const HIGHLIGHTS = [
+  "Member of the Institute of Chartered Accountants of India",
+  "In practice since 2017, across manufacturing, trading, real estate, IT and professional services",
+  "Internal audit, internal controls and risk advisory",
+  "AI and automation applied to day-to-day compliance work",
+  "Speaker, content creator and mentor",
+];
+
+const TIMELINE = [
+  { y: "2017", t: "Started CA Practice" },
+  { y: "2018 – 2020", t: "Focused on Audit & Taxation" },
+  { y: "2021 – 2023", t: "Expanded into Business Advisory" },
+  { y: "2024 – Present", t: "AI Automation & Process Transformation" },
 ];
 
 const SERVICES = [
-  { c: "audit", t: "Statutory Audit", d: "Audit of companies under the Companies Act." },
-  { c: "audit", t: "Tax Audit", d: "Audit under section 44AB of the Income-tax Act." },
-  { c: "audit", t: "Internal Audit", d: "Review of internal controls and processes." },
-  { c: "audit", t: "Bank & Concurrent Audit", d: "Statutory and concurrent audit of bank branches." },
-  { c: "audit", t: "Stock Audit", d: "Verification of inventory and receivables." },
-  { c: "audit", t: "GST Audit & Reconciliation", d: "Reconciliation and audit support under GST." },
-  { c: "dtax", t: "Income Tax Return Filing", d: "Returns for individuals, firms, and companies." },
-  { c: "dtax", t: "Tax Planning", d: "Compliance-based planning within the Act." },
-  { c: "dtax", t: "TDS / TCS Compliance", d: "Deduction, deposit, and quarterly returns." },
-  { c: "dtax", t: "Assessments & Scrutiny", d: "Representation before income-tax authorities." },
-  { c: "dtax", t: "Appeals (CIT-A / ITAT)", d: "Preparation and representation in appeals." },
-  { c: "dtax", t: "Capital Gains Advisory", d: "Computation and compliance on capital gains." },
-  { c: "dtax", t: "NRI Taxation", d: "Residential status, returns, and remittances." },
-  { c: "gst", t: "GST Registration", d: "New registration and amendments." },
-  { c: "gst", t: "GST Return Filing", d: "GSTR-1, GSTR-3B, and annual returns." },
-  { c: "gst", t: "GSTR-9 / 9C", d: "Annual return and reconciliation statement." },
-  { c: "gst", t: "GST Refunds", d: "Preparation and filing of refund applications." },
-  { c: "gst", t: "E-way Bill Compliance", d: "Support with e-way bill requirements." },
-  { c: "gst", t: "GST Advisory", d: "Classification, ITC, and compliance queries." },
-  { c: "corp", t: "Company Incorporation", d: "Private Limited, OPC, and Public companies." },
-  { c: "corp", t: "LLP Registration", d: "Formation and agreement filing." },
-  { c: "corp", t: "Annual ROC Filings", d: "AOC-4, MGT-7, and related forms." },
-  { c: "corp", t: "Director KYC (DIR-3)", d: "Annual director KYC compliance." },
-  { c: "corp", t: "Secretarial Compliance", d: "Statutory registers and event-based filings." },
-  { c: "corp", t: "Strike Off / Closure", d: "Company and LLP closure procedures." },
-  { c: "reg", t: "MSME / Udyam", d: "Registration for micro and small enterprises." },
-  { c: "reg", t: "Startup India", d: "DPIIT recognition support." },
-  { c: "reg", t: "Import Export Code (IEC)", d: "Application for IEC." },
-  { c: "reg", t: "12A / 80G", d: "Registration for trusts and NGOs." },
-  { c: "reg", t: "PF / ESIC / PT", d: "Employer registrations and compliance." },
-  { c: "reg", t: "PAN / TAN / DSC", d: "Application for PAN, TAN, and digital signatures." },
-  { c: "acc", t: "Bookkeeping & Accounting", d: "Maintenance of books of account." },
-  { c: "acc", t: "Financial Statements", d: "Preparation of statements as per applicable norms." },
-  { c: "acc", t: "MIS Reporting", d: "Periodic management information reports." },
-  { c: "acc", t: "Payroll Processing", d: "Salary computation and statutory deductions." },
-  { c: "acc", t: "Virtual CFO Support", d: "Finance function support for businesses." },
-  { c: "acc", t: "Account Reconciliation", d: "Bank, vendor, and ledger reconciliation." },
-  { c: "adv", t: "Project Report & CMA", d: "Reports and CMA data for bank finance." },
-  { c: "adv", t: "Due Diligence", d: "Financial and tax due diligence." },
-  { c: "adv", t: "Certifications", d: "Net worth, turnover, and other certificates." },
-  { c: "adv", t: "FEMA / RBI Matters", d: "Compliance support under FEMA." },
-  { c: "adv", t: "Business Advisory", d: "Financial and regulatory advisory." },
+  {
+    i: FileCheck2, t: "Income Tax",
+    d: "Direct tax work end to end — planning the year ahead, filing on time, and representing you when a notice arrives.",
+    items: [
+      "Return filing for individuals, firms, LLPs and companies",
+      "Advance tax, TDS and TCS compliance",
+      "Tax planning within the provisions of the Act",
+      "Notices, assessments and scrutiny proceedings",
+      "Appeals before CIT(A) and ITAT",
+      "Capital gains and non-resident taxation",
+    ],
+  },
+  {
+    i: Receipt, t: "GST & Indirect Tax",
+    d: "Registration through to litigation, with reconciliations documented well enough to hold up if the department asks.",
+    items: [
+      "Registration, amendments and cancellation",
+      "GSTR-1, GSTR-3B, GSTR-9 and GSTR-9C filing",
+      "Input tax credit reconciliation against GSTR-2B",
+      "Refund applications and follow-up",
+      "E-invoicing and e-way bill compliance",
+      "Departmental notices, audits and appeals",
+    ],
+  },
+  {
+    i: ShieldCheck, t: "Audit & Assurance",
+    d: "Audits carried out under the applicable Standards on Auditing, with working papers that stand up to review.",
+    items: [
+      "Statutory audit under the Companies Act",
+      "Tax audit under section 44AB",
+      "Stock, debtor and fixed asset verification",
+      "Bank branch and concurrent audit",
+      "Certification and other attest work",
+      "Management reporting on audit findings",
+    ],
+  },
+  {
+    i: Landmark, t: "Internal Audit",
+    d: "An independent look at how work actually gets done — where value leaks, and where a process is being trusted more than it deserves.",
+    items: [
+      "Risk-based internal audit planning",
+      "Process walkthroughs and substantive testing",
+      "Revenue, procurement and payables cycle review",
+      "Inventory, stores and branch audits",
+      "Observation reports with practical action plans",
+      "Follow-up and closure tracking",
+    ],
+  },
+  {
+    i: Layers, t: "Internal Controls",
+    d: "Designing and testing the controls that keep reported numbers reliable — and documenting them so the design is evidenced, not assumed.",
+    items: [
+      "Internal financial controls (IFC) design and documentation",
+      "Control testing and gap assessment",
+      "Standard operating procedures for key processes",
+      "Delegation of authority and approval matrices",
+      "Segregation of duties review",
+      "Remediation support and re-testing",
+    ],
+  },
+  {
+    i: Briefcase, t: "Business Advisory",
+    d: "Financial input for decisions you are already weighing — expansion, funding, pricing or restructuring.",
+    items: [
+      "Business planning and financial projections",
+      "Project reports and CMA data for lenders",
+      "Financial analysis and ratio review",
+      "Costing and pricing support",
+      "Financial and tax due diligence",
+      "Fund raising documentation",
+    ],
+  },
+  {
+    i: Cpu, t: "AI & Automation",
+    d: "Applying automation to the repetitive parts of finance, so the time saved goes into judgement instead of data entry.",
+    items: [
+      "Workflow automation for recurring compliance",
+      "Reconciliation and data-matching automation",
+      "Analytics and management dashboards",
+      "Document processing using AI tools",
+      "Tool selection and implementation",
+      "Team training on practical AI use",
+    ],
+  },
+  {
+    i: Calculator, t: "Virtual CFO",
+    d: "An outsourced finance function for businesses that need the discipline of a CFO without a full-time hire.",
+    items: [
+      "Monthly MIS and management reporting",
+      "Cash flow planning and monitoring",
+      "Budgeting and variance analysis",
+      "Payroll processing and statutory deductions",
+      "Vendor, receivable and inventory control",
+      "Reporting to boards, lenders and investors",
+    ],
+  },
+  {
+    i: Building2, t: "Company Compliance",
+    d: "Keeping the entity clean on the ROC side, so a missed filing never turns into a problem years later.",
+    items: [
+      "Company, OPC and LLP incorporation",
+      "Annual filings — AOC-4, MGT-7 and related forms",
+      "Director KYC and DIN compliance",
+      "Statutory registers, minutes and resolutions",
+      "Event-based filings and charge management",
+      "Strike-off, closure and winding-up support",
+    ],
+  },
 ];
 
-const V = {
-  bg: "#080D14", card: "rgba(255,255,255,0.035)", gold: "#E0AE5A", mint: "#67E8D0",
-  indigo: "#7C6BF0", text: "#ECEAE1", mute: "#8B98A2", line: "rgba(236,234,225,0.11)",
+
+const INSIGHTS = {
+  "Instagram Reels": [
+    { t: "ITR Filing Last Date FY 24-25", cta: "Watch on Instagram", url: "#" },
+    { t: "Tax Planning Under New Tax Regime", cta: "Watch on Instagram", url: "#" },
+    { t: "Cash vs Bank Transactions Limit", cta: "Watch on Instagram", url: "#" },
+  ],
+  YouTube: [
+    { t: "Add your video title", cta: "Watch on YouTube", url: "#" },
+    { t: "Add your video title", cta: "Watch on YouTube", url: "#" },
+    { t: "Add your video title", cta: "Watch on YouTube", url: "#" },
+  ],
+  Articles: [
+    { t: "Add your article title", cta: "Read article", url: "#" },
+    { t: "Add your article title", cta: "Read article", url: "#" },
+    { t: "Add your article title", cta: "Read article", url: "#" },
+  ],
 };
 
-/* Scroll-reveal wrapper */
+const PROMISES = [
+  { i: Wallet, t: "Transparent Fees" },
+  { i: Timer, t: "Timely Delivery" },
+  { i: Lock, t: "100% Confidential" },
+  { i: Headphones, t: "Dedicated Support" },
+];
+
+const GOLD = "#E5A94E";
+
 function Reveal({ children, delay = 0, className = "" }) {
-  const ref = useRef(null); const [seen, setSeen] = useState(false);
+  const ref = useRef(null);
+  const [seen, setSeen] = useState(false);
   useEffect(() => {
     const el = ref.current; if (!el) return;
-    const io = new IntersectionObserver(([e]) => { if (e.isIntersecting) { setSeen(true); io.disconnect(); } }, { threshold: 0.15 });
+    const io = new IntersectionObserver(([e]) => { if (e.isIntersecting) { setSeen(true); io.disconnect(); } }, { threshold: 0.1, rootMargin: "0px 0px -8% 0px" });
     io.observe(el); return () => io.disconnect();
   }, []);
   return <div ref={ref} className={`rev ${seen ? "in" : ""} ${className}`} style={{ transitionDelay: `${delay}ms` }}>{children}</div>;
 }
 
-/* Count-up number */
-function CountUp({ value }) {
-  const ref = useRef(null); const [txt, setTxt] = useState("0");
-  const num = parseInt(String(value).replace(/\D/g, ""), 10);
-  const suffix = String(value).replace(/[0-9]/g, "");
-  useEffect(() => {
-    const el = ref.current; if (!el || isNaN(num)) { setTxt(value); return; }
-    const io = new IntersectionObserver(([e]) => {
-      if (e.isIntersecting) {
-        io.disconnect(); const start = performance.now(); const dur = 1100;
-        const tick = (now) => {
-          const p = Math.min(1, (now - start) / dur); const eased = 1 - Math.pow(1 - p, 3);
-          setTxt(Math.round(num * eased) + suffix); if (p < 1) requestAnimationFrame(tick);
-        }; requestAnimationFrame(tick);
-      }
-    }, { threshold: 0.5 });
-    io.observe(el); return () => io.disconnect();
-  }, [num, suffix, value]);
-  return <span ref={ref}>{txt}</span>;
-}
-
-/* Tilt + glow card */
-function TiltCard({ children, style }) {
-  const ref = useRef(null);
-  const onMove = (e) => {
-    const el = ref.current; if (!el) return; const r = el.getBoundingClientRect();
-    const px = (e.clientX - r.left) / r.width - 0.5; const py = (e.clientY - r.top) / r.height - 0.5;
-    el.style.transform = `perspective(700px) rotateX(${-py * 5}deg) rotateY(${px * 5}deg) translateY(-4px)`;
-    el.style.setProperty("--gx", `${(px + 0.5) * 100}%`); el.style.setProperty("--gy", `${(py + 0.5) * 100}%`);
-  };
-  const onLeave = () => { const el = ref.current; if (el) el.style.transform = ""; };
-  return <div ref={ref} onMouseMove={onMove} onMouseLeave={onLeave} className="tilt" style={style}>{children}</div>;
-}
-
-/* Magnetic button */
-function Magnetic({ children, onClick, style, className }) {
-  const ref = useRef(null);
-  const onMove = (e) => { const el = ref.current; if (!el) return; const r = el.getBoundingClientRect();
-    el.style.transform = `translate(${(e.clientX - r.left - r.width / 2) * 0.25}px, ${(e.clientY - r.top - r.height / 2) * 0.35}px)`; };
-  const onLeave = () => { const el = ref.current; if (el) el.style.transform = ""; };
-  return <button ref={ref} onClick={onClick} onMouseMove={onMove} onMouseLeave={onLeave} className={`mag ${className || ""}`} style={style}>{children}</button>;
-}
-
-export default function CAFirmSite() {
+export default function Site() {
   const [menu, setMenu] = useState(false);
-  const [cat, setCat] = useState("audit");
   const [scrolled, setScrolled] = useState(false);
-  const [progress, setProgress] = useState(0);
-  const cursorDot = useRef(null); const cursorRing = useRef(null);
-  const [intro, setIntro] = useState(true);
-  const gridCanvas = useRef(null);
-  const [form, setForm] = useState({ name: "", email: "", message: "" });
-  const [status, setStatus] = useState("idle"); // idle | sending | ok | error
+  const [tab, setTab] = useState("Instagram Reels");
+  const [form, setForm] = useState({ name: "", email: "", phone: "", service: "", message: "" });
+  const [status, setStatus] = useState("idle");
 
   useEffect(() => {
-    const onScroll = () => {
-      setScrolled(window.scrollY > 20);
-      const h = document.documentElement.scrollHeight - window.innerHeight;
-      setProgress(h > 0 ? window.scrollY / h : 0);
-    };
+    const onScroll = () => setScrolled(window.scrollY > 12);
     window.addEventListener("scroll", onScroll, { passive: true }); onScroll();
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // custom cursor
-  useEffect(() => {
-    if (window.matchMedia("(pointer: coarse)").matches) return;
-    let rx = 0, ry = 0, dx = 0, dy = 0; let raf;
-    const move = (e) => {
-      dx = e.clientX; dy = e.clientY;
-      if (cursorDot.current) cursorDot.current.style.transform = `translate(${dx}px, ${dy}px)`;
-    };
-    const loop = () => { rx += (dx - rx) * 0.15; ry += (dy - ry) * 0.15;
-      if (cursorRing.current) cursorRing.current.style.transform = `translate(${rx}px, ${ry}px)`; raf = requestAnimationFrame(loop); };
-    window.addEventListener("mousemove", move); loop();
-    return () => { window.removeEventListener("mousemove", move); cancelAnimationFrame(raf); };
-  }, []);
-
-  // intro loader
-  useEffect(() => { const t = setTimeout(() => setIntro(false), 1700); return () => clearTimeout(t); }, []);
-
-  // interactive generative dot-grid (canvas) — signature moment
-  useEffect(() => {
-    const canvas = gridCanvas.current; if (!canvas) return;
-    const ctx = canvas.getContext("2d");
-    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    let w = 0, h = 0, raf, dots = [], mouse = { x: -9999, y: -9999 };
-    const spacing = 42;
-    const resize = () => {
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
-      w = canvas.clientWidth; h = canvas.clientHeight;
-      canvas.width = w * dpr; canvas.height = h * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      dots = [];
-      for (let x = spacing / 2; x < w; x += spacing) for (let y = spacing / 2; y < h; y += spacing) dots.push({ x, y, bx: x, by: y });
-    };
-    const onMove = (e) => { const r = canvas.getBoundingClientRect(); mouse.x = e.clientX - r.left; mouse.y = e.clientY - r.top; };
-    const onLeave = () => { mouse.x = -9999; mouse.y = -9999; };
-    const draw = () => {
-      ctx.clearRect(0, 0, w, h);
-      const R = 130;
-      for (const d of dots) {
-        const dx = d.bx - mouse.x, dy = d.by - mouse.y; const dist = Math.hypot(dx, dy) || 0.001;
-        let ox = 0, oy = 0, alpha = 0.10, size = 1.1;
-        if (dist < R) { const f = 1 - dist / R; ox = (dx / dist) * f * 12; oy = (dy / dist) * f * 12; alpha = 0.10 + f * 0.55; size = 1.1 + f * 2.1; }
-        d.x += (d.bx + ox - d.x) * 0.12; d.y += (d.by + oy - d.y) * 0.12;
-        ctx.beginPath(); ctx.arc(d.x, d.y, size, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(224,174,90,${alpha})`; ctx.fill();
-      }
-      raf = requestAnimationFrame(draw);
-    };
-    resize();
-    if (reduce) { draw(); cancelAnimationFrame(raf); }
-    else { draw(); window.addEventListener("mousemove", onMove); canvas.addEventListener("mouseleave", onLeave); }
-    window.addEventListener("resize", resize);
-    return () => { cancelAnimationFrame(raf); window.removeEventListener("resize", resize); window.removeEventListener("mousemove", onMove); };
-  }, []);
-
-  const nav = [["Services", "services"], ["About", "about"], ["Approach", "approach"], ["AI", "ai"], ["Contact", "contact"]];
   const go = (id) => { document.getElementById(id)?.scrollIntoView({ behavior: "smooth" }); setMenu(false); };
-  const shown = SERVICES.filter((s) => s.c === cat);
-  const stats = [["Est.", FIRM.estYear], ["Service categories", "7"], ["Compliance services", "40+"], ["Based", "Ujjain"]];
-  const glyphs = ["₹", "%", "§", "44AB", "GST", "∑", "9C", "TDS"];
   const setF = (k, v) => setForm((f) => ({ ...f, [k]: v }));
-  const sendEmail = async () => {
+  const waLink = `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent("Hello Anish, I would like to get in touch.")}`;
+
+  const sendMessage = async () => {
     if (!form.name.trim() || !form.message.trim()) { setStatus("error"); return; }
     setStatus("sending");
     try {
       const res = await fetch("https://api.web3forms.com/submit", {
-        method: "POST", headers: { "Content-Type": "application/json", Accept: "application/json" },
-        body: JSON.stringify({ access_key: WEB3FORMS_KEY, subject: "New enquiry from your website", name: form.name, email: form.email, message: form.message }),
+        method: "POST",
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        body: JSON.stringify({ access_key: WEB3FORMS_KEY, subject: "New enquiry from your website", ...form }),
       });
       const data = await res.json();
-      if (data.success) { setStatus("ok"); setForm({ name: "", email: "", message: "" }); } else setStatus("error");
+      if (data.success) { setStatus("ok"); setForm({ name: "", email: "", phone: "", service: "", message: "" }); }
+      else setStatus("error");
     } catch { setStatus("error"); }
   };
-  const sendWhatsApp = () => {
-    const msg = `Hello Anish,\n\nName: ${form.name || "-"}\nEmail: ${form.email || "-"}\n\n${form.message || "I would like to get in touch."}`;
-    window.open(`https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(msg)}`, "_blank");
-  };
-  const inputStyle = { width: "100%", background: "rgba(255,255,255,0.04)", border: `1px solid ${V.line}`, color: V.text, padding: "12px 14px", borderRadius: 10, outline: "none", fontFamily: "inherit", fontSize: 14, marginBottom: 12 };
+
+  const nav = [["Home", "top"], ["About", "about"], ["Services", "services"], ["Insights", "insights"], ["Contact", "contact"]];
 
   return (
-    <div style={{ backgroundColor: V.bg, color: V.text, fontFamily: "'Archivo', sans-serif", minHeight: "100vh", overflowX: "hidden" }}>
+    <div className="site">
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;500;600;700;800;900&family=IBM+Plex+Mono:wght@400;500&display=swap');
-        * { cursor: none; }
-        @media (pointer: coarse){ * { cursor: auto; } .cursor-el { display:none !important; } }
-        .disp { font-family:'Archivo',sans-serif; } .name { font-family:'Anton',sans-serif; letter-spacing:-0.01em; line-height:0.9; } .mono { font-family:'IBM Plex Mono',monospace; }
-        .cursor-el { position: fixed; top:0; left:0; z-index:9999; pointer-events:none; border-radius:50%; margin-left:-4px; margin-top:-4px; }
-        .rev { opacity:0; transform: translateY(24px); transition: opacity .8s cubic-bezier(.2,.7,.3,1), transform .8s cubic-bezier(.2,.7,.3,1); }
-        .rev.in { opacity:1; transform:none; }
-        @keyframes aurora1 { 0%,100%{ transform: translate(0,0) scale(1); } 50%{ transform: translate(8%,-6%) scale(1.25);} }
-        @keyframes aurora2 { 0%,100%{ transform: translate(0,0) scale(1); } 50%{ transform: translate(-7%,7%) scale(1.15);} }
-        @keyframes aurora3 { 0%,100%{ transform: translate(0,0) scale(1); } 50%{ transform: translate(6%,8%) scale(1.2);} }
-        .au1 { animation: aurora1 20s ease-in-out infinite; } .au2 { animation: aurora2 26s ease-in-out infinite; } .au3 { animation: aurora3 23s ease-in-out infinite; }
-        @keyframes floatG { 0%,100%{ transform: translateY(0) rotate(0);} 50%{ transform: translateY(-16px) rotate(4deg);} }
-        @keyframes wordUp { from{ opacity:0; transform: translateY(120%) rotate(3deg);} to{ opacity:1; transform:none;} }
-        .wrap-mask { overflow: hidden; display: inline-block; padding-bottom: .08em; }
-        .word { display:inline-block; animation: wordUp .9s cubic-bezier(.2,.8,.2,1) both; }
-        .grid-bg { background-image: linear-gradient(rgba(236,234,225,0.035) 1px, transparent 1px), linear-gradient(90deg, rgba(236,234,225,0.035) 1px, transparent 1px); background-size: 48px 48px; }
-        .tilt { transition: transform .3s cubic-bezier(.2,.7,.3,1); position: relative; }
-        .tilt::after { content:""; position:absolute; inset:0; border-radius:16px; background: radial-gradient(240px circle at var(--gx,50%) var(--gy,50%), rgba(224,174,90,0.14), transparent 60%); opacity:0; transition: opacity .3s; pointer-events:none; }
-        .tilt:hover::after { opacity:1; }
-        .svc-arrow { opacity:0; transform: translate(-4px,4px); transition: all .25s ease; }
-        .tilt:hover .svc-arrow { opacity:1; transform:none; }
-        .mag { transition: transform .25s cubic-bezier(.2,.7,.3,1), box-shadow .25s ease, background .25s ease; }
-        .tab { transition: all .22s ease; }
-        a:focus-visible, button:focus-visible { outline: 2px solid ${V.gold}; outline-offset: 3px; }
-        @media (prefers-reduced-motion: reduce){ .rev,.au1,.au2,.au3,.word,.tilt,.mag{ transition:none!important; animation:none!important; opacity:1!important; transform:none!important; } }
+        @import url('https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700&family=Inter:wght@300;400;450;500;600&family=IBM+Plex+Mono:wght@400;450&display=swap');
+
+        .site{
+          --bg:#0A0A0C; --bg-soft:#0C0C0F;
+          --surface:rgba(255,255,255,.022); --surface-2:rgba(255,255,255,.034);
+          --line:rgba(255,255,255,.068); --line-2:rgba(255,255,255,.105);
+          --gold:#E5A94E; --gold-dim:rgba(229,169,78,.30); --gold-ghost:rgba(229,169,78,.10);
+          --text:#F4F4F2; --text-2:#C9C9CE; --mute:#96969D;
+          --live:#3DD167;
+          --r-card:14px; --r-btn:12px;
+          --e-out:cubic-bezier(.22,1,.36,1); --e:cubic-bezier(.4,0,.2,1);
+          --shadow-card:0 22px 48px -30px rgba(0,0,0,.9);
+          --shadow-btn:0 10px 26px -12px rgba(229,169,78,.5);
+          background:var(--bg); color:var(--text);
+          font-family:'Inter',sans-serif; font-weight:400;
+          -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
+          min-height:100vh; overflow-x:hidden;
+        }
+        .site ::selection{ background:rgba(229,169,78,.26); }
+
+        /* ---- type scale ---- */
+        .disp{ font-family:'Inter Tight',sans-serif; }
+        .mono{ font-family:'IBM Plex Mono',monospace; font-weight:450; }
+        .t-h1{ font-family:'Inter Tight',sans-serif; font-weight:700; font-size:clamp(2.25rem,4.3vw,3.5rem); line-height:1.075; letter-spacing:-.032em; }
+        .t-h2{ font-family:'Inter Tight',sans-serif; font-weight:700; font-size:clamp(1.8rem,3.1vw,2.6rem); line-height:1.14; letter-spacing:-.028em; }
+        .t-h3{ font-family:'Inter Tight',sans-serif; font-weight:600; font-size:1.0625rem; line-height:1.32; letter-spacing:-.012em; }
+        .t-stat{ font-family:'Inter Tight',sans-serif; font-weight:700; font-size:clamp(1.6rem,2.3vw,1.95rem); line-height:1; letter-spacing:-.028em; }
+        .t-body{ font-size:.9375rem; line-height:1.72; color:var(--text-2); }
+        .t-sm{ font-size:.8438rem; line-height:1.62; color:var(--mute); }
+        .t-xs{ font-size:.7813rem; line-height:1.55; color:var(--mute); }
+        .t-eyebrow{ font-family:'IBM Plex Mono',monospace; font-size:.6563rem; letter-spacing:.30em; text-transform:uppercase; color:var(--gold); }
+
+        /* ---- layout rhythm ---- */
+        .wrap{ max-width:1220px; margin:0 auto; padding-left:24px; padding-right:24px; }
+        @media (min-width:768px){ .wrap{ padding-left:40px; padding-right:40px; } }
+        .sec{ padding-top:96px; padding-bottom:96px; }
+        @media (min-width:768px){ .sec{ padding-top:132px; padding-bottom:132px; } }
+        .rule-t{ border-top:1px solid var(--line); }
+        .rule-b{ border-bottom:1px solid var(--line); }
+
+        /* ---- motion ---- */
+        .rev{ opacity:0; transform:translate3d(0,22px,0); transition:opacity .82s var(--e-out), transform .82s var(--e-out); }
+        .rev.in{ opacity:1; transform:none; }
+        @keyframes riseIn{ from{opacity:0; transform:translate3d(0,24px,0);} to{opacity:1; transform:none;} }
+        @keyframes drift{ 0%,100%{ transform:translate3d(0,0,0) scale(1);} 50%{ transform:translate3d(-1.6%,1.6%,0) scale(1.05);} }
+        .in-1{ animation:riseIn .9s var(--e-out) .05s both; }
+        .in-2{ animation:riseIn .9s var(--e-out) .13s both; }
+        .in-3{ animation:riseIn .9s var(--e-out) .21s both; }
+        .in-4{ animation:riseIn .9s var(--e-out) .30s both; }
+        .in-5{ animation:riseIn .9s var(--e-out) .38s both; }
+        .in-6{ animation:riseIn .9s var(--e-out) .46s both; }
+        .in-7{ animation:riseIn 1.15s var(--e-out) .18s both; }
+
+        /* ---- surfaces ---- */
+        .card{
+          position:relative; background:var(--surface); border:1px solid var(--line);
+          border-radius:var(--r-card);
+          transition:border-color .45s var(--e), background .45s var(--e), transform .45s var(--e-out), box-shadow .45s var(--e);
+        }
+        .card::before{
+          content:""; position:absolute; inset:0; border-radius:inherit; pointer-events:none;
+          background:linear-gradient(180deg, rgba(229,169,78,.09), transparent 42%);
+          opacity:0; transition:opacity .45s var(--e);
+        }
+        .card-i:hover{ transform:translate3d(0,-3px,0); border-color:var(--gold-dim); background:var(--surface-2); box-shadow:var(--shadow-card); }
+        .card-i:hover::before{ opacity:1; }
+        .card-i:hover .go{ color:var(--gold); }
+        .card-i:hover .go svg{ transform:translate3d(3px,0,0); }
+        .go{ display:inline-flex; align-items:center; gap:7px; color:var(--mute); font-size:.8125rem; transition:color .35s var(--e); }
+        .go svg{ transition:transform .35s var(--e-out); }
+
+        .panel{ background:var(--surface); border:1px solid var(--line); border-radius:var(--r-card); }
+        .cell{ border-right:1px solid var(--line); }
+        .cell:last-child{ border-right:none; }
+
+        /* ---- buttons ---- */
+        .btn{
+          display:inline-flex; align-items:center; justify-content:center; gap:10px;
+          height:50px; padding:0 28px; border-radius:var(--r-btn);
+          font-family:'Inter Tight',sans-serif; font-weight:600; font-size:.9375rem; letter-spacing:-.008em;
+          white-space:nowrap;
+          transition:transform .4s var(--e-out), box-shadow .4s var(--e), background .35s var(--e), border-color .35s var(--e), color .35s var(--e);
+        }
+        .btn svg{ transition:transform .4s var(--e-out); }
+        .btn-p{ background:var(--gold); color:#15110A; box-shadow:0 6px 18px -10px rgba(229,169,78,.55); }
+        .btn-p:hover{ transform:translate3d(0,-2px,0); box-shadow:var(--shadow-btn); background:#EFB65D; }
+        .btn-p:hover svg{ transform:translate3d(3px,0,0); }
+        .btn-p:active{ transform:translate3d(0,0,0); }
+        .btn-g{ background:transparent; color:var(--text); border:1px solid var(--line-2); font-weight:500; }
+        .btn-g:hover{ transform:translate3d(0,-2px,0); border-color:var(--gold-dim); background:rgba(255,255,255,.028); }
+        .btn-g:active{ transform:translate3d(0,0,0); }
+        .btn-sm{ height:44px; padding:0 22px; font-size:.875rem; }
+
+        /* ---- chips ---- */
+        .chip{
+          display:inline-flex; align-items:center; gap:8px;
+          height:38px; padding:0 14px; border-radius:10px;
+          border:1px solid var(--line); color:var(--mute);
+          font-family:'IBM Plex Mono',monospace; font-size:.6875rem; letter-spacing:.02em;
+          transition:border-color .4s var(--e), color .4s var(--e), background .4s var(--e);
+        }
+        .chip:hover{ border-color:var(--gold-dim); color:var(--text); background:rgba(255,255,255,.022); }
+
+        /* ---- icon plates ---- */
+        .plate{ display:inline-flex; align-items:center; justify-content:center; border-radius:11px;
+          background:var(--gold-ghost); border:1px solid rgba(229,169,78,.22); transition:border-color .45s var(--e), background .45s var(--e); }
+        .plate-lg{ width:42px; height:42px; }
+        .plate-sm{ width:32px; height:32px; }
+        .card-i:hover .plate{ border-color:var(--gold-dim); background:rgba(229,169,78,.15); }
+
+        /* ---- forms ---- */
+        .field{
+          width:100%; height:52px; padding:0 16px; border-radius:var(--r-btn);
+          background:rgba(255,255,255,.026); border:1px solid var(--line);
+          color:var(--text); font-family:'Inter',sans-serif; font-size:.9063rem; outline:none;
+          transition:border-color .35s var(--e), background .35s var(--e), box-shadow .35s var(--e);
+        }
+        textarea.field{ height:auto; padding:15px 16px; resize:vertical; line-height:1.65; }
+        .field::placeholder{ color:#6B6B72; }
+        .field:hover{ border-color:var(--line-2); }
+        .field:focus{ border-color:var(--gold-dim); background:rgba(255,255,255,.038); box-shadow:0 0 0 3px rgba(229,169,78,.10); }
+        select.field{ appearance:none; cursor:pointer;
+          background-image:linear-gradient(45deg,transparent 50%,#96969D 50%),linear-gradient(135deg,#96969D 50%,transparent 50%);
+          background-position:calc(100% - 19px) 23px, calc(100% - 14px) 23px;
+          background-size:5px 5px,5px 5px; background-repeat:no-repeat; }
+
+        /* ---- nav ---- */
+        .navlink{ position:relative; color:var(--mute); font-size:.875rem; transition:color .35s var(--e); }
+        .navlink:hover{ color:var(--text); }
+        .navlink::after{ content:""; position:absolute; left:0; right:0; bottom:-6px; height:1px; background:var(--gold);
+          transform:scaleX(0); transform-origin:left; transition:transform .45s var(--e-out); }
+        .navlink:hover::after{ transform:scaleX(1); }
+
+        /* ---- hero atmosphere ---- */
+        .grid-bg{ background-image:linear-gradient(rgba(255,255,255,.016) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.016) 1px,transparent 1px); background-size:68px 68px; }
+        .hero-light{ position:absolute; right:-10%; top:-24%; width:70vw; height:70vw; max-width:880px; max-height:880px;
+          border-radius:50%; background:radial-gradient(circle, rgba(229,169,78,.115), rgba(229,169,78,.028) 46%, transparent 70%);
+          filter:blur(18px); animation:drift 44s ease-in-out infinite; will-change:transform; pointer-events:none; }
+        .portrait-frame{ position:relative; width:100%; max-width:640px; margin-left:auto; }
+        .portrait-img{ display:block; width:100%; height:auto; }
+        @media (min-width:1024px){
+          .portrait-col{ margin-top:-74px; }
+          .portrait-frame{ max-width:none; height:600px; }
+          .portrait-img{ height:100%; object-fit:cover; object-position:50% 20%;
+            -webkit-mask-image:radial-gradient(ellipse 84% 94% at 50% 42%, #000 44%, transparent 84%);
+            mask-image:radial-gradient(ellipse 84% 94% at 50% 42%, #000 44%, transparent 84%); }
+        }
+        .arc{ position:absolute; border-radius:50%; border:1px solid rgba(229,169,78,.09); pointer-events:none; }
+        .fade-edge{ position:absolute; inset:0; pointer-events:none;
+          background:radial-gradient(ellipse 94% 84% at 50% 44%, transparent 42%, rgba(10,10,12,.94) 100%); }
+
+        .social{ display:inline-flex; align-items:center; justify-content:center; width:38px; height:38px;
+          border-radius:10px; border:1px solid var(--line); color:var(--mute);
+          transition:border-color .4s var(--e), color .4s var(--e), transform .4s var(--e-out); }
+        .social:hover{ border-color:var(--gold-dim); color:var(--gold); transform:translate3d(0,-2px,0); }
+
+        .site a:focus-visible,.site button:focus-visible,.site input:focus-visible,.site textarea:focus-visible,.site select:focus-visible{
+          outline:2px solid var(--gold); outline-offset:3px; border-radius:6px; }
+
+        @media (prefers-reduced-motion:reduce){
+          .site *{ animation:none!important; transition:none!important; }
+          .rev{ opacity:1!important; transform:none!important; }
+        }
       `}</style>
 
-      {/* Custom cursor */}
-      <div ref={cursorDot} className="cursor-el" style={{ width: 8, height: 8, background: V.gold }} />
-      <div ref={cursorRing} className="cursor-el" style={{ width: 34, height: 34, marginLeft: -17, marginTop: -17, border: `1px solid rgba(224,174,90,0.5)` }} />
+      {/* ================= NAV ================= */}
+      <header className="fixed top-0 inset-x-0 z-50" style={{
+        background: scrolled ? "rgba(10,10,12,.82)" : "transparent",
+        backdropFilter: scrolled ? "blur(18px) saturate(140%)" : "none",
+        WebkitBackdropFilter: scrolled ? "blur(18px) saturate(140%)" : "none",
+        borderBottom: `1px solid ${scrolled ? "var(--line)" : "transparent"}`,
+        transition: "background .5s var(--e), border-color .5s var(--e), backdrop-filter .5s var(--e)",
+      }}>
+        <div className="wrap flex items-center justify-between" style={{ height: 74 }}>
+          <button onClick={() => go("top")} className="disp" style={{ fontSize: 17, fontWeight: 600, letterSpacing: "-.02em" }}>
+            <span style={{ color: GOLD }}>CA</span> {FIRM.short}
+          </button>
 
-      {/* Intro loader */}
-      <div className="cursor-el-none" style={{ position: "fixed", inset: 0, zIndex: 9998, background: V.bg, display: "flex", alignItems: "center", justifyContent: "center", pointerEvents: intro ? "auto" : "none", opacity: intro ? 1 : 0, transition: "opacity .7s ease" }}>
-        <div style={{ overflow: "hidden", paddingBottom: ".1em" }}>
-          <div className="disp" style={{ fontSize: "clamp(1.6rem,5vw,3rem)", fontWeight: 600, letterSpacing: "-0.01em", animation: "wordUp 1s cubic-bezier(.2,.8,.2,1) both" }}>
-            {FIRM.name}<span style={{ color: V.gold }}>.</span>
-          </div>
-        </div>
-      </div>
-
-      {/* Scroll progress spine */}
-      <div style={{ position: "fixed", top: 0, left: 0, height: "100vh", width: 2, zIndex: 60, background: V.line }}>
-        <div style={{ width: "100%", height: `${progress * 100}%`, background: `linear-gradient(${V.gold}, ${V.mint})`, transition: "height .1s linear" }} />
-      </div>
-
-      {/* Header */}
-      <header className="fixed top-0 inset-x-0 z-50" style={{ backgroundColor: scrolled ? "rgba(8,13,20,0.82)" : "transparent", backdropFilter: scrolled ? "blur(14px)" : "none", borderBottom: `1px solid ${scrolled ? V.line : "transparent"}`, transition: "all .3s ease" }}>
-        <div className="max-w-6xl mx-auto px-5 py-4 flex items-center justify-between">
-          <button onClick={() => go("top")} className="disp text-lg font-semibold tracking-tight">{FIRM.name}</button>
-          <nav className="hidden md:flex items-center gap-8 text-sm">
-            {nav.map(([l, id]) => <button key={id} onClick={() => go(id)} className="tab" style={{ color: V.mute }} onMouseEnter={(e) => e.currentTarget.style.color = V.text} onMouseLeave={(e) => e.currentTarget.style.color = V.mute}>{l}</button>)}
-            <Magnetic onClick={() => go("contact")} className="disp font-medium" style={{ fontSize: 14, padding: "8px 18px", borderRadius: 999, backgroundColor: V.gold, color: "#080D14" }}>Contact</Magnetic>
+          <nav className="hidden lg:flex items-center" style={{ gap: 34 }}>
+            {nav.map(([l, id]) => <button key={id} onClick={() => go(id)} className="navlink">{l}</button>)}
+            <button onClick={() => go("contact")} className="btn btn-p btn-sm" style={{ marginLeft: 8 }}>Book Consultation</button>
           </nav>
-          <button className="md:hidden" onClick={() => setMenu((v) => !v)} aria-label="Menu">{menu ? <X size={22} /> : <Menu size={22} />}</button>
+
+          <button className="lg:hidden" onClick={() => setMenu((v) => !v)} aria-label="Menu" aria-expanded={menu}>
+            {menu ? <X size={21} strokeWidth={1.75} /> : <Menu size={21} strokeWidth={1.75} />}
+          </button>
         </div>
         {menu && (
-          <div className="md:hidden px-5 pb-4 flex flex-col gap-3" style={{ backgroundColor: "rgba(8,13,20,0.96)", borderBottom: `1px solid ${V.line}` }}>
-            {nav.map(([l, id]) => <button key={id} onClick={() => go(id)} className="text-left py-1.5 text-sm" style={{ color: V.mute }}>{l}</button>)}
+          <div className="lg:hidden" style={{ background: "rgba(10,10,12,.97)", borderBottom: "1px solid var(--line)" }}>
+            <div className="wrap flex flex-col gap-1 pb-6 pt-1">
+              {nav.map(([l, id]) => <button key={id} onClick={() => go(id)} className="text-left navlink" style={{ padding: "9px 0" }}>{l}</button>)}
+              <button onClick={() => go("contact")} className="btn btn-p btn-sm mt-3">Book Consultation</button>
+            </div>
           </div>
         )}
       </header>
 
-      {/* Hero */}
-      <section id="top" className="relative grid-bg overflow-hidden" style={{ minHeight: "100vh" }}>
-        <canvas ref={gridCanvas} style={{ position: "absolute", inset: 0, width: "100%", height: "100%", zIndex: 0 }} />
-        {/* aurora mesh */}
-        <div className="au1 pointer-events-none" style={{ position: "absolute", top: "-20%", right: "-10%", width: 620, height: 620, borderRadius: "50%", background: `radial-gradient(circle, rgba(224,174,90,0.20), transparent 62%)`, filter: "blur(28px)" }} />
-        <div className="au2 pointer-events-none" style={{ position: "absolute", bottom: "-25%", left: "-15%", width: 640, height: 640, borderRadius: "50%", background: `radial-gradient(circle, rgba(124,107,240,0.16), transparent 62%)`, filter: "blur(30px)" }} />
-        <div className="au3 pointer-events-none" style={{ position: "absolute", top: "30%", left: "40%", width: 460, height: 460, borderRadius: "50%", background: `radial-gradient(circle, rgba(103,232,208,0.10), transparent 62%)`, filter: "blur(26px)" }} />
-        {/* floating theme glyphs */}
-        {glyphs.map((g, i) => (
-          <span key={i} className="mono pointer-events-none hidden md:block" style={{
-            position: "absolute", color: "rgba(236,234,225,0.07)", fontSize: [22, 34, 18, 28, 20, 40, 24, 30][i],
-            top: `${[18, 70, 40, 80, 26, 60, 12, 50][i]}%`, left: `${[12, 20, 82, 70, 55, 88, 40, 8][i]}%`,
-            animation: `floatG ${7 + i}s ease-in-out ${i * 0.6}s infinite`,
-          }}>{g}</span>
-        ))}
+      {/* ================= HERO ================= */}
+      <section id="top" className="relative grid-bg overflow-hidden">
+        <div className="hero-light" />
+        <div className="arc hidden md:block" style={{ right: "-18%", top: "-32%", width: "64vw", height: "64vw", maxWidth: 860, maxHeight: 860 }} />
+        <div className="fade-edge" />
 
-        <div className="relative max-w-6xl mx-auto px-5 flex flex-col justify-center" style={{ minHeight: "100vh", zIndex: 2 }}>
-          <div className="mono text-[12px] tracking-[0.3em] uppercase mb-6 flex items-center gap-3" style={{ color: V.gold, animation: "wordUp .8s ease both" }}>
-            <span style={{ width: 28, height: 1, background: V.gold }} /> Est. {FIRM.estYear} · Ujjain, India
-          </div>
-          <h1 className="name" style={{ fontSize: "clamp(1.9rem, 5.2vw, 3.6rem)", textTransform: "uppercase" }}>
-            <span className="wrap-mask"><span className="word" style={{ animationDelay: "0.15s", color: V.text }}>Anish</span></span><br />
-            <span className="wrap-mask"><span className="word" style={{ animationDelay: "0.30s", color: V.gold }}>Choudhary</span></span>
-          </h1>
-          <div className="mono mt-5 text-sm tracking-[0.25em] uppercase" style={{ color: V.mute, animation: "wordUp .8s ease .45s both" }}>Chartered Accountant · Independent Practice</div>
-          <p className="mt-7 text-lg max-w-xl leading-relaxed" style={{ color: V.mute, animation: "wordUp .8s ease .7s both" }}>
-            An independent Chartered Accountant — not a firm — using AI to work faster and sharper, from audit and tax to building things like this website.
-          </p>
-          <div className="mt-9 flex flex-wrap gap-3" style={{ animation: "wordUp .8s ease .85s both" }}>
-            <Magnetic onClick={() => go("services")} className="disp font-medium" style={{ padding: "13px 26px", borderRadius: 999, backgroundColor: V.gold, color: "#080D14", display: "flex", alignItems: "center", gap: 8 }}>
-              View services <ArrowRight size={17} />
-            </Magnetic>
-            <Magnetic onClick={() => go("contact")} className="disp font-medium" style={{ padding: "13px 26px", borderRadius: 999, border: `1px solid ${V.line}`, color: V.text, background: "transparent" }}>
-              Get in touch
-            </Magnetic>
-          </div>
+        <div className="wrap relative grid lg:grid-cols-[53%_47%] items-center lg:items-start" style={{ gap: 32, paddingTop: 138, paddingBottom: 88 }}>
+          <div>
+            <div className="in-1 inline-flex items-center mono" style={{
+              height: 32, padding: "0 15px", borderRadius: 999, border: "1px solid rgba(229,169,78,.32)",
+              color: GOLD, fontSize: 10, letterSpacing: ".22em", textTransform: "uppercase",
+            }}>Chartered Accountant</div>
 
-          {/* stats */}
-          <div className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-px rounded-2xl overflow-hidden" style={{ backgroundColor: V.line, border: `1px solid ${V.line}`, animation: "wordUp .8s ease 1s both" }}>
-            {stats.map(([l, v], i) => (
-              <div key={i} className="p-5" style={{ backgroundColor: V.bg }}>
-                <div className="disp text-3xl font-semibold" style={{ color: V.gold }}><CountUp value={v} /></div>
-                <div className="mono text-[10px] tracking-[0.15em] uppercase mt-2" style={{ color: V.mute }}>{l}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+            <h1 className="t-h1" style={{ marginTop: 26 }}>
+              <span className="in-2" style={{ display: "block" }}>Helping Businesses</span>
+              <span className="in-3" style={{ display: "block" }}>
+                <span style={{ color: GOLD }}>Plan Better</span>, Stay <span style={{ color: GOLD }}>Compliant</span>
+              </span>
+              <span className="in-4" style={{ display: "block" }}>&amp; Build Stronger Systems.</span>
+            </h1>
 
-      {/* Services */}
-      <section id="services" className="max-w-6xl mx-auto px-5 py-24">
-        <Reveal>
-          <div className="mono text-[12px] tracking-[0.25em] uppercase mb-3" style={{ color: V.gold }}>What we do</div>
-          <h2 className="disp text-3xl md:text-5xl font-semibold max-w-2xl leading-tight">A full range of chartered accountancy services.</h2>
-        </Reveal>
-        <Reveal delay={100}>
-          <div className="flex flex-wrap gap-2 mt-10 mb-10">
-            {CATS.map((cObj) => {
-              const active = cat === cObj.id; const Icon = cObj.icon;
-              return (
-                <button key={cObj.id} onClick={() => setCat(cObj.id)} className="tab flex items-center gap-2 px-4 py-2.5 rounded-full text-sm disp font-medium"
-                  style={{ backgroundColor: active ? V.gold : "transparent", color: active ? "#080D14" : V.mute, border: `1px solid ${active ? V.gold : V.line}` }}>
-                  <Icon size={15} /> {cObj.label}
-                </button>
-              );
-            })}
-          </div>
-        </Reveal>
-        <div key={cat} className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {shown.map((s, i) => (
-            <div key={s.t} style={{ animation: `wordUp .5s ease ${i * 0.05}s both` }}>
-              <TiltCard style={{ borderRadius: 16, backgroundColor: V.card, border: `1px solid ${V.line}`, padding: 24, height: "100%" }}>
-                <div className="flex items-start justify-between gap-3">
-                  <h3 className="disp text-lg font-medium">{s.t}</h3>
-                  <ArrowUpRight size={18} className="svc-arrow shrink-0" style={{ color: V.gold }} />
-                </div>
-                <p className="text-sm mt-3 leading-relaxed" style={{ color: V.mute }}>{s.d}</p>
-              </TiltCard>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* About */}
-      <section id="about" className="relative py-24" style={{ borderTop: `1px solid ${V.line}`, borderBottom: `1px solid ${V.line}` }}>
-        <div className="max-w-6xl mx-auto px-5 grid md:grid-cols-2 gap-12 items-center">
-          <Reveal>
-            <div className="mono text-[12px] tracking-[0.25em] uppercase mb-4" style={{ color: V.gold }}>About the firm</div>
-            <h2 className="disp text-3xl md:text-4xl font-semibold leading-tight mb-6">Precision, independence, and professional care.</h2>
-            <p className="text-base leading-relaxed" style={{ color: V.mute }}>
-              {FIRM.name} is a Chartered Accountant based in {FIRM.city}, working with individuals, proprietors, partnerships, and companies across India. Services are provided both online and in person, in accordance with the applicable standards and professional guidelines issued by the Institute of Chartered Accountants of India.
+            <p className="t-body in-4" style={{ marginTop: 24, maxWidth: "33rem" }}>
+              Practical advice, careful compliance and AI-assisted systems —<br />
+              so the finance side of your business stops being a worry.
             </p>
-          </Reveal>
-          <Reveal delay={150}>
-            <div className="grid grid-cols-2 gap-px rounded-2xl overflow-hidden" style={{ backgroundColor: V.line, border: `1px solid ${V.line}` }}>
-              {[["Practitioner", "Anish Choudhary"], ["Since", FIRM.estYear], ["Based in", "Ujjain"], ["Mode", "Online"]].map(([l, v], i) => (
-                <div key={i} className="p-6" style={{ backgroundColor: V.bg }}>
-                  <div className="mono text-[10px] tracking-[0.15em] uppercase mb-2" style={{ color: V.mute }}>{l}</div>
-                  <div className="disp text-lg" style={{ color: V.text }}>{v}</div>
-                </div>
+
+            <div className="in-5 flex flex-wrap" style={{ gap: 10, marginTop: 28 }}>
+              {["Tax & GST", "Audit & Assurance", "Internal Controls", "AI & Automation"].map((c) => (
+                <span key={c} className="chip"><BadgeCheck size={13} strokeWidth={1.9} style={{ color: GOLD }} />{c}</span>
               ))}
             </div>
-          </Reveal>
-        </div>
-      </section>
 
-      {/* Approach */}
-      <section id="approach" className="max-w-6xl mx-auto px-5 py-24">
-        <Reveal>
-          <div className="mono text-[12px] tracking-[0.25em] uppercase mb-3" style={{ color: V.gold }}>How we work</div>
-          <h2 className="disp text-3xl md:text-5xl font-semibold max-w-2xl leading-tight mb-14">A clear, structured engagement process.</h2>
-        </Reveal>
-        <div className="grid md:grid-cols-3 gap-4">
-          {[["01", "Understand", "Review requirements, applicable law, and timelines for the engagement."],
-            ["02", "Execute", "Carry out the work as per applicable standards, with documentation."],
-            ["03", "Report & Comply", "Deliver deliverables and file the required statutory forms."]].map(([n, t, d], i) => (
-            <Reveal key={n} delay={i * 100}>
-              <TiltCard style={{ borderRadius: 16, backgroundColor: V.card, border: `1px solid ${V.line}`, padding: 28, height: "100%" }}>
-                <div className="disp text-4xl font-bold mb-4" style={{ color: V.gold }}>{n}</div>
-                <h3 className="disp text-xl font-medium mb-3">{t}</h3>
-                <p className="text-sm leading-relaxed" style={{ color: V.mute }}>{d}</p>
-              </TiltCard>
-            </Reveal>
-          ))}
-        </div>
-      </section>
+            <div className="in-6 flex flex-wrap" style={{ gap: 12, marginTop: 34 }}>
+              <button onClick={() => go("contact")} className="btn btn-p">Book a Consultation <ArrowRight size={16} strokeWidth={2} /></button>
+              <a href={waLink} target="_blank" rel="noreferrer" className="btn btn-g">Chat on WhatsApp <MessageCircle size={16} strokeWidth={1.8} /></a>
+            </div>
 
-      {/* Technology & AI */}
-      <section id="ai" className="relative py-24" style={{ borderTop: `1px solid ${V.line}` }}>
-        <div className="max-w-6xl mx-auto px-5">
+            <div className="in-6 flex items-center t-xs" style={{ gap: 9, marginTop: 18 }}>
+              <span style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--live)", boxShadow: "0 0 0 3px rgba(61,209,103,.15)", display: "inline-block" }} />
+              Usually replies within 30 minutes
+            </div>
+          </div>
+
+          {/* portrait */}
+          <div className="portrait-col relative flex justify-center lg:justify-end in-7">
+            <div className="portrait-frame">
+              <img src="/portrait.webp" className="portrait-img"
+                alt={`${FIRM.name}, Chartered Accountant, at his office in Ujjain`}
+                width="1100" height="1312" loading="eager" decoding="async" fetchpriority="high" />
+              <div className="absolute" style={{
+                right: 0, bottom: 6, padding: "18px 26px", borderRadius: 14, textAlign: "center",
+                background: "rgba(14,14,17,.74)", border: "1px solid rgba(229,169,78,.26)",
+                backdropFilter: "blur(14px)", WebkitBackdropFilter: "blur(14px)",
+                boxShadow: "0 24px 50px -30px rgba(0,0,0,.95)",
+              }}>
+                <div className="t-stat" style={{ color: GOLD }}>9+</div>
+                <div className="mono" style={{ fontSize: 9.5, letterSpacing: ".16em", textTransform: "uppercase", color: "var(--mute)", marginTop: 7 }}>Years of Experience</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* stats */}
+        <div className="wrap relative" style={{ paddingBottom: 110 }}>
           <Reveal>
-            <div className="mono text-[12px] tracking-[0.25em] uppercase mb-3" style={{ color: V.gold }}>Technology & AI</div>
-            <h2 className="disp text-3xl md:text-5xl font-bold max-w-3xl leading-tight mb-6">A Chartered Accountant who works with AI.</h2>
-            <p className="text-base md:text-lg max-w-2xl leading-relaxed mb-14" style={{ color: V.mute }}>
-              Compliance work is precise and repetitive — exactly where modern AI tools help. I use them to speed up
-              research, drafting, and review, so more time goes into judgement and less into busywork. This website
-              itself was designed and built using AI.
-            </p>
+            <div className="panel overflow-hidden">
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
+                {STATS.map((s, i) => (
+                  <div key={s.l} className="text-center" style={{
+                    padding: "30px 18px",
+                    borderRight: `1px solid var(--line)`,
+                    borderBottom: `1px solid var(--line)`,
+                  }}>
+                    <div className="t-stat" style={{ color: GOLD }}>{s.v}</div>
+                    <div className="t-xs" style={{ marginTop: 9 }}>{s.l}</div>
+                  </div>
+                ))}
+              </div>
+              <div style={{ padding: "26px 24px 28px" }}>
+                <div className="t-xs text-center" style={{ marginBottom: 20 }}>Trusted by Businesses Across</div>
+                <div className="flex flex-wrap items-center justify-center" style={{ gap: "16px 44px" }}>
+                  {INDUSTRIES.map(({ i: Icon, t }) => (
+                    <span key={t} className="inline-flex items-center t-xs" style={{ gap: 9, color: "var(--text-2)" }}>
+                      <Icon size={15} strokeWidth={1.6} style={{ color: GOLD }} />{t}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </div>
           </Reveal>
-          <div className="grid md:grid-cols-3 gap-4">
-            {[
-              ["AI-assisted workflows", "Research, drafting, and reconciliation supported by modern AI tools."],
-              ["Faster turnaround", "Automating repetitive steps to focus on analysis and judgement."],
-              ["Built with AI", "This site was designed and developed using AI — as a working demonstration."],
-            ].map(([t, d], i) => (
-              <Reveal key={t} delay={i * 100}>
-                <TiltCard style={{ borderRadius: 16, backgroundColor: V.card, border: `1px solid ${V.line}`, padding: 28, height: "100%" }}>
-                  <h3 className="disp text-xl font-semibold mb-3">{t}</h3>
-                  <p className="text-sm leading-relaxed" style={{ color: V.mute }}>{d}</p>
-                </TiltCard>
+        </div>
+      </section>
+
+      {/* ================= ABOUT ================= */}
+      <section id="about" className="sec">
+        <div className="wrap grid lg:grid-cols-2" style={{ gap: 64 }}>
+          <div>
+            <Reveal><div className="t-eyebrow">About me</div></Reveal>
+            <Reveal delay={70}>
+              <h2 className="t-h2" style={{ marginTop: 16 }}>
+                A CA who combines<br />
+                <span style={{ color: GOLD }}>Experience</span> with <span style={{ color: GOLD }}>Technology.</span>
+              </h2>
+            </Reveal>
+            <Reveal delay={130}>
+              <p className="t-body" style={{ marginTop: 24, maxWidth: "34rem" }}>
+                I'm {FIRM.name}, practising since {FIRM.estYear} in Ujjain. I work with businesses and
+                professionals on tax planning, compliance and building financial systems that hold up.
+                I use AI and automation to deliver faster, more accurate and insight-driven work.
+              </p>
+            </Reveal>
+            <Reveal delay={190}>
+              <ul style={{ marginTop: 30, display: "grid", gap: 15 }}>
+                {HIGHLIGHTS.map((h) => (
+                  <li key={h} className="flex items-start" style={{ gap: 13 }}>
+                    <span className="plate" style={{ width: 20, height: 20, borderRadius: 6, marginTop: 2, flexShrink: 0 }}>
+                      <Check size={11} strokeWidth={2.4} style={{ color: GOLD }} />
+                    </span>
+                    <span style={{ fontSize: ".9063rem", lineHeight: 1.5, color: "var(--text)" }}>{h}</span>
+                  </li>
+                ))}
+              </ul>
+            </Reveal>
+            <Reveal delay={250}>
+              <button onClick={() => go("services")} className="btn btn-p" style={{ marginTop: 38 }}>
+                See What I Do <ArrowRight size={16} strokeWidth={2} />
+              </button>
+            </Reveal>
+          </div>
+
+          <Reveal delay={120}>
+            <div className="panel h-full" style={{ padding: "42px 38px" }}>
+              <div className="relative" style={{ paddingLeft: 30 }}>
+                <div style={{ position: "absolute", left: 5, top: 9, bottom: 12, width: 1, background: "linear-gradient(180deg, rgba(229,169,78,.75), rgba(229,169,78,.06))" }} />
+                {TIMELINE.map((t, i) => (
+                  <div key={t.y} style={{ marginBottom: i < TIMELINE.length - 1 ? 40 : 0 }}>
+                    <span style={{ position: "absolute", left: 0, marginTop: 7, width: 11, height: 11, borderRadius: "50%", background: GOLD, boxShadow: "0 0 0 4px rgba(229,169,78,.12)" }} />
+                    <div className="t-h3" style={{ fontSize: "1rem" }}>{t.y}</div>
+                    <div className="t-sm" style={{ marginTop: 7 }}>{t.t}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* ================= SERVICES ================= */}
+      <section id="services" className="sec rule-t rule-b">
+        <div className="wrap">
+          <Reveal><div className="t-eyebrow text-center">What I do</div></Reveal>
+          <Reveal delay={70}>
+            <h2 className="t-h2 text-center" style={{ marginTop: 16 }}>
+              Comprehensive Solutions for<br className="hidden md:block" /> Your Business Needs
+            </h2>
+          </Reveal>
+
+          <p className="t-body text-center" style={{ maxWidth: "56ch", margin: "20px auto 0" }}>
+            Nine areas of work, each with the specific scope it usually involves — so you know what
+            is covered before we speak.
+          </p>
+
+          <div className="grid lg:grid-cols-2" style={{ gap: 16, marginTop: 60 }}>
+            {SERVICES.map(({ i: Icon, t, d, items }, idx) => (
+              <Reveal key={t} delay={(idx % 2) * 90}>
+                <div className="card card-i h-full flex flex-col" style={{ padding: "30px 30px 28px" }}>
+                  <div className="flex items-start" style={{ gap: 16 }}>
+                    <span className="plate plate-lg" style={{ flexShrink: 0 }}>
+                      <Icon size={19} strokeWidth={1.6} style={{ color: GOLD }} />
+                    </span>
+                    <div>
+                      <h3 className="t-h3" style={{ fontSize: "1.125rem" }}>{t}</h3>
+                      <p className="t-sm" style={{ marginTop: 9 }}>{d}</p>
+                    </div>
+                  </div>
+
+                  <ul style={{ marginTop: 22, paddingTop: 20, borderTop: "1px solid var(--line)", display: "grid", gap: 11, flex: 1 }}>
+                    {items.map((it) => (
+                      <li key={it} className="flex items-start" style={{ gap: 11 }}>
+                        <span style={{ width: 4, height: 4, borderRadius: "50%", background: GOLD, marginTop: 8, flexShrink: 0, opacity: .8 }} />
+                        <span style={{ fontSize: ".8438rem", lineHeight: 1.55, color: "var(--text-2)" }}>{it}</span>
+                      </li>
+                    ))}
+                  </ul>
+
+                  <button onClick={() => go("contact")} className="go" style={{ marginTop: 22 }}>
+                    Discuss this <ArrowRight size={13} strokeWidth={2} />
+                  </button>
+                </div>
+              </Reveal>
+            ))}
+          </div>
+
+          <Reveal>
+            <div className="text-center" style={{ marginTop: 56 }}>
+              <button onClick={() => go("contact")} className="btn btn-p">Discuss Your Requirement <ArrowRight size={16} strokeWidth={2} /></button>
+            </div>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* ================= INSIGHTS ================= */}
+      <section id="insights" className="sec rule-t">
+        <div className="wrap">
+          <Reveal><div className="t-eyebrow text-center">Latest insights</div></Reveal>
+          <Reveal delay={70}><h2 className="t-h2 text-center" style={{ marginTop: 16 }}>Stay Updated. Stay Ahead.</h2></Reveal>
+
+          <Reveal delay={130}>
+            <div className="flex justify-center" style={{ gap: 10, marginTop: 40 }}>
+              {Object.keys(INSIGHTS).map((k) => {
+                const on = tab === k;
+                return (
+                  <button key={k} onClick={() => setTab(k)} className="disp" aria-pressed={on}
+                    style={{
+                      height: 42, padding: "0 22px", borderRadius: 999, fontSize: ".8438rem", fontWeight: 500,
+                      background: on ? GOLD : "transparent", color: on ? "#15110A" : "var(--mute)",
+                      border: `1px solid ${on ? GOLD : "var(--line)"}`,
+                      transition: "all .42s var(--e)",
+                    }}>{k}</button>
+                );
+              })}
+            </div>
+          </Reveal>
+
+          <div key={tab} className="grid md:grid-cols-3" style={{ gap: 16, marginTop: 44 }}>
+            {INSIGHTS[tab].map((p, i) => (
+              <Reveal key={p.t + i} delay={i * 80}>
+                <a href={p.url} target={p.url === "#" ? undefined : "_blank"} rel="noreferrer" className="card card-i block h-full overflow-hidden">
+                  <div className="relative flex items-center" style={{
+                    height: 194, padding: "0 26px",
+                    background: "linear-gradient(146deg, rgba(229,169,78,.115), rgba(255,255,255,.014) 56%, transparent)",
+                    borderBottom: "1px solid var(--line)",
+                  }}>
+                    <div className="disp" style={{ fontSize: "1.25rem", fontWeight: 700, lineHeight: 1.24, letterSpacing: "-.025em", maxWidth: "76%" }}>{p.t}</div>
+                    <span className="absolute inline-flex items-center justify-center" style={{
+                      right: 22, bottom: 22, width: 38, height: 38, borderRadius: "50%",
+                      background: "rgba(10,10,12,.55)", border: "1px solid rgba(229,169,78,.34)",
+                    }}>
+                      <Play size={13} strokeWidth={1.5} style={{ color: GOLD, marginLeft: 2 }} fill={GOLD} />
+                    </span>
+                  </div>
+                  <div style={{ padding: 22 }}>
+                    <div className="t-h3" style={{ fontSize: ".9063rem" }}>{p.t}</div>
+                    <div className="go" style={{ marginTop: 13 }}>{p.cta} <ArrowRight size={12} strokeWidth={2} /></div>
+                  </div>
+                </a>
               </Reveal>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Contact */}
-      <section id="contact" className="relative py-24 grid-bg" style={{ borderTop: `1px solid ${V.line}` }}>
-        <div className="max-w-6xl mx-auto px-5">
+      {/* ================= CTA ================= */}
+      <section className="relative overflow-hidden grid-bg rule-t rule-b">
+        <div className="pointer-events-none absolute inset-0" style={{ background: "radial-gradient(ellipse 58% 100% at 84% 50%, rgba(229,169,78,.135), transparent 64%)" }} />
+        <div className="wrap relative sec">
           <Reveal>
-            <div className="mono text-[12px] tracking-[0.25em] uppercase mb-3" style={{ color: V.gold }}>Get in touch</div>
-            <h2 className="disp text-3xl md:text-5xl font-semibold mb-12">Contact</h2>
-          </Reveal>
-          <div className="grid md:grid-cols-2 gap-6 items-start">
-            {/* Left: details */}
-            <div className="grid gap-4">
-              {[[Globe, "Availability", FIRM.availability], [Phone, "Phone", FIRM.phone], [Mail, "Email", FIRM.email], [Clock, "Office hours", FIRM.hours]].map(([Icon, l, v], i) => (
-                <Reveal key={i} delay={i * 80}>
-                  <TiltCard style={{ borderRadius: 16, backgroundColor: V.card, border: `1px solid ${V.line}`, padding: 20, display: "flex", gap: 14 }}>
-                    <Icon size={19} style={{ color: V.gold, marginTop: 2, flexShrink: 0 }} />
-                    <div>
-                      <div className="mono text-[10px] tracking-[0.15em] uppercase mb-1.5" style={{ color: V.mute }}>{l}</div>
-                      <div className="text-sm" style={{ color: V.text }}>{v}</div>
-                    </div>
-                  </TiltCard>
-                </Reveal>
-              ))}
+            <h2 className="t-h2" style={{ maxWidth: "19ch" }}>Let's Build a Stronger Financial Future Together.</h2>
+            <p className="t-body" style={{ marginTop: 22, maxWidth: "40ch" }}>
+              Share what you need and I'll tell you exactly how I can help — and what it will involve.
+            </p>
+            <div className="flex flex-wrap" style={{ gap: 12, marginTop: 34 }}>
+              <button onClick={() => go("contact")} className="btn btn-p">Request a Call <ArrowRight size={16} strokeWidth={2} /></button>
+              <a href={waLink} target="_blank" rel="noreferrer" className="btn btn-g">Chat on WhatsApp <MessageCircle size={16} strokeWidth={1.8} /></a>
             </div>
-
-            {/* Right: message form (no <form> tag) */}
-            <Reveal delay={120}>
-              <div style={{ borderRadius: 16, background: V.card, border: `1px solid ${V.line}`, padding: 24 }}>
-                <div className="mono text-[10px] tracking-[0.15em] uppercase mb-4" style={{ color: V.mute }}>Send a message</div>
-                <input aria-label="Your name" placeholder="Your name" value={form.name} onChange={(e) => setF("name", e.target.value)} style={inputStyle} />
-                <input aria-label="Your email" placeholder="Your email" value={form.email} onChange={(e) => setF("email", e.target.value)} style={inputStyle} />
-                <textarea aria-label="Your message" placeholder="Your message" rows={4} value={form.message} onChange={(e) => setF("message", e.target.value)} style={{ ...inputStyle, resize: "vertical" }} />
-                <div className="flex flex-wrap gap-3 mt-1">
-                  <Magnetic onClick={sendEmail} className="disp font-medium" style={{ padding: "12px 22px", borderRadius: 999, backgroundColor: V.gold, color: "#080D14", display: "flex", alignItems: "center", gap: 8, opacity: status === "sending" ? 0.7 : 1 }}>
-                    <Send size={16} /> {status === "sending" ? "Sending…" : "Send message"}
-                  </Magnetic>
-                  <Magnetic onClick={sendWhatsApp} className="disp font-medium" style={{ padding: "12px 22px", borderRadius: 999, border: `1px solid ${V.line}`, color: V.text, background: "transparent", display: "flex", alignItems: "center", gap: 8 }}>
-                    <MessageCircle size={16} /> WhatsApp
-                  </Magnetic>
-                </div>
-                {status === "ok" && <div className="text-sm mt-4" style={{ color: V.mint }}>Thanks — your message has been sent.</div>}
-                {status === "error" && <div className="text-sm mt-4" style={{ color: V.mute }}>Add your name and message, or reach out on WhatsApp.</div>}
-              </div>
-            </Reveal>
-          </div>
+          </Reveal>
         </div>
       </section>
 
-      {/* Footer */}
-      <footer style={{ borderTop: `1px solid ${V.line}` }}>
-        <div className="max-w-6xl mx-auto px-5 py-10">
-          <div className="disp text-xl font-semibold mb-1">{FIRM.name}</div>
-          <div className="mono text-[11px] mb-4" style={{ color: V.gold }}>Designed &amp; built with AI · Anish Choudhary</div>
-          <p className="mono text-[11px] leading-relaxed max-w-2xl" style={{ color: V.mute }}>
-            This website is intended to provide general information about {FIRM.name} and its services. It is not an advertisement or a solicitation of work. The information provided is not a substitute for professional advice. © {new Date().getFullYear()} {FIRM.name}. All rights reserved.
-          </p>
+      {/* ================= CONTACT ================= */}
+      <section id="contact" className="sec">
+        <div className="wrap">
+          <Reveal><div className="t-eyebrow">Get in touch</div></Reveal>
+          <Reveal delay={70}><h2 className="t-h2" style={{ marginTop: 16 }}>I'm Just a Message Away.</h2></Reveal>
+
+          <div className="grid lg:grid-cols-[36%_64%]" style={{ gap: 16, marginTop: 52 }}>
+            <Reveal>
+              <div className="panel h-full" style={{ padding: 30 }}>
+                <div style={{ display: "grid", gap: 24 }}>
+                  {[[MapPin, FIRM.city], [Mail, FIRM.email], [Phone, FIRM.phone], [Clock, FIRM.hours]].map(([Icon, v], i) => (
+                    <div key={i} className="flex items-center" style={{ gap: 14 }}>
+                      <span className="plate plate-sm" style={{ flexShrink: 0 }}>
+                        <Icon size={14} strokeWidth={1.7} style={{ color: GOLD }} />
+                      </span>
+                      <span style={{ fontSize: ".875rem", lineHeight: 1.5, color: "var(--text-2)" }}>{v}</span>
+                    </div>
+                  ))}
+                </div>
+                <div className="flex" style={{ gap: 10, marginTop: 32, paddingTop: 28, borderTop: "1px solid var(--line)" }}>
+                  {[[Linkedin, "#", "LinkedIn"], [Instagram, "#", "Instagram"], [Youtube, "#", "YouTube"], [MessageCircle, waLink, "WhatsApp"]].map(([Icon, href, label], i) => (
+                    <a key={i} href={href} target="_blank" rel="noreferrer" aria-label={label} className="social">
+                      <Icon size={15} strokeWidth={1.7} />
+                    </a>
+                  ))}
+                </div>
+              </div>
+            </Reveal>
+
+            <Reveal delay={100}>
+              <div className="panel" style={{ padding: 30 }}>
+                <div className="grid sm:grid-cols-2" style={{ gap: 14 }}>
+                  <input className="field" aria-label="Your name" placeholder="Your Name" value={form.name} onChange={(e) => setF("name", e.target.value)} />
+                  <input className="field" aria-label="Your email" type="email" placeholder="Your Email" value={form.email} onChange={(e) => setF("email", e.target.value)} />
+                  <input className="field" aria-label="Phone number" type="tel" placeholder="Phone Number" value={form.phone} onChange={(e) => setF("phone", e.target.value)} />
+                  <select className="field" aria-label="Select service" value={form.service} onChange={(e) => setF("service", e.target.value)}
+                    style={{ color: form.service ? "var(--text)" : "#6B6B72" }}>
+                    <option value="">Select Service</option>
+                    {SERVICES.map((s) => <option key={s.t} value={s.t} style={{ color: "#111" }}>{s.t}</option>)}
+                  </select>
+                </div>
+                <textarea className="field" aria-label="Your message" placeholder="Your Message" rows={5}
+                  value={form.message} onChange={(e) => setF("message", e.target.value)} style={{ marginTop: 14 }} />
+
+                <button onClick={sendMessage} className="btn btn-p" style={{ width: "100%", marginTop: 16, opacity: status === "sending" ? .72 : 1 }}>
+                  {status === "sending" ? "Sending…" : "Send Message"} <Send size={15} strokeWidth={1.9} />
+                </button>
+
+                <div className="flex items-center justify-center t-xs" style={{ gap: 9, marginTop: 16 }}>
+                  <span style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--live)", boxShadow: "0 0 0 3px rgba(61,209,103,.15)", display: "inline-block" }} />
+                  Usually replies within 30 minutes
+                </div>
+                {status === "ok" && <div className="t-xs text-center" style={{ marginTop: 14, color: GOLD }}>Thanks — your message has been sent.</div>}
+                {status === "error" && <div className="t-xs text-center" style={{ marginTop: 14 }}>Add your name and message, or reach out on WhatsApp.</div>}
+              </div>
+            </Reveal>
+          </div>
+
+          <Reveal delay={160}>
+            <div className="panel overflow-hidden grid grid-cols-2 md:grid-cols-4" style={{ marginTop: 16 }}>
+              {PROMISES.map(({ i: Icon, t }, i) => (
+                <div key={t} className="flex items-center justify-center" style={{ gap: 11, padding: "26px 16px", borderRight: i < PROMISES.length - 1 ? "1px solid var(--line)" : "none" }}>
+                  <Icon size={16} strokeWidth={1.6} style={{ color: GOLD }} />
+                  <span style={{ fontSize: ".8125rem", color: "var(--text-2)" }}>{t}</span>
+                </div>
+              ))}
+            </div>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* ================= FOOTER ================= */}
+      <footer className="rule-t">
+        <div className="wrap" style={{ paddingTop: 72, paddingBottom: 44 }}>
+          <div className="grid md:grid-cols-4" style={{ gap: 48 }}>
+            <div>
+              <div className="disp" style={{ fontSize: 17, fontWeight: 600, letterSpacing: "-.02em" }}>
+                <span style={{ color: GOLD }}>CA</span> {FIRM.short}
+              </div>
+              <p className="t-xs" style={{ marginTop: 16, maxWidth: "26ch", lineHeight: 1.75 }}>
+                Chartered Accountant helping businesses and professionals with tax, audit,
+                compliance, advisory and AI automation.
+              </p>
+            </div>
+
+            <div>
+              <div className="t-eyebrow" style={{ fontSize: ".625rem", letterSpacing: ".2em" }}>Quick Links</div>
+              <ul style={{ marginTop: 20, display: "grid", gap: 12 }}>
+                {nav.map(([l, id]) => <li key={id}><button onClick={() => go(id)} className="navlink" style={{ fontSize: ".8125rem" }}>{l}</button></li>)}
+              </ul>
+            </div>
+
+            <div>
+              <div className="t-eyebrow" style={{ fontSize: ".625rem", letterSpacing: ".2em" }}>Services</div>
+              <ul className="t-xs" style={{ marginTop: 20, display: "grid", gap: 12 }}>
+                {SERVICES.map((s) => <li key={s.t}>{s.t}</li>)}
+              </ul>
+            </div>
+
+            <div>
+              <div className="t-eyebrow" style={{ fontSize: ".625rem", letterSpacing: ".2em" }}>Connect</div>
+              <ul className="t-xs" style={{ marginTop: 20, display: "grid", gap: 14 }}>
+                <li className="flex items-start" style={{ gap: 10 }}><MapPin size={13} strokeWidth={1.7} style={{ color: GOLD, marginTop: 3, flexShrink: 0 }} />{FIRM.city}</li>
+                <li className="flex items-start" style={{ gap: 10 }}><Mail size={13} strokeWidth={1.7} style={{ color: GOLD, marginTop: 3, flexShrink: 0 }} />{FIRM.email}</li>
+                <li className="flex items-start" style={{ gap: 10 }}><Phone size={13} strokeWidth={1.7} style={{ color: GOLD, marginTop: 3, flexShrink: 0 }} />{FIRM.phone}</li>
+              </ul>
+            </div>
+          </div>
+
+          <div className="flex flex-col md:flex-row items-center justify-between" style={{ gap: 14, marginTop: 60, paddingTop: 28, borderTop: "1px solid var(--line)" }}>
+            <p className="mono text-center md:text-left" style={{ fontSize: ".6875rem", lineHeight: 1.7, color: "var(--mute)", maxWidth: "72ch" }}>
+              © {new Date().getFullYear()} {FIRM.name}. This website is for general information only — it is not an
+              advertisement or a solicitation of work, and is not a substitute for professional advice.
+            </p>
+            <div className="mono" style={{ fontSize: ".6875rem", color: "var(--mute)", whiteSpace: "nowrap" }}>Ujjain, Madhya Pradesh</div>
+          </div>
         </div>
       </footer>
     </div>
