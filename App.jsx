@@ -5,6 +5,7 @@ import {
   Building2, Landmark, Calculator, Briefcase, Store, Factory, Home, Cpu, Layers,
   Users, BadgeCheck, Wallet, Timer, Lock, Headphones,
 } from "lucide-react";
+import portraitImg from "./portrait.webp";
 
 /* ===========================================================================
    CA ANISH CHOUDHARY
@@ -494,7 +495,7 @@ export default function Site() {
           {/* portrait */}
           <div className="portrait-col relative flex justify-center lg:justify-end in-7">
             <div className="portrait-frame">
-              <img src="/portrait.webp" className="portrait-img"
+              <img src={portraitImg} className="portrait-img"
                 alt={`${FIRM.name}, Chartered Accountant, at his office in Ujjain`}
                 width="1100" height="1312" loading="eager" decoding="async" fetchpriority="high" />
               <div className="absolute" style={{
