@@ -29,7 +29,7 @@ import toolDaughter from "./toolInvestmentDaughter.js";
 
    ⚠️  BEFORE PUBLISHING
    1. STATS — every figure must be true and verifiable. Delete what you cannot
-      substantiate. "9+ years" follows from Est. 2017; "500+" and "1000+" are
+      substantiate. "9+ years" follows from Est. 2017; "100+" and "1000+" are
       yours to confirm against your records or remove.
    2. INSIGHTS + social links — replace "#" with your real URLs.
    3. WEB3FORMS_KEY — free key from web3forms.com so the form reaches your inbox.
