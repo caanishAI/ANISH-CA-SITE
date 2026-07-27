@@ -52,7 +52,7 @@ const WEB3FORMS_KEY = "4a41bfd2-56e1-4c15-bcf9-5a9de76c7ac2";
 
 const STATS = [
   { v: "9+", l: "Years Experience" },
-  { v: "500+", l: "Businesses Served" },
+  { v: "100+", l: "Businesses Served" },
   { v: "1000+", l: "Returns Filed" },
   { v: "5+", l: "Industries Served" },
   { v: "30 Min", l: "Avg. Response Time" },
