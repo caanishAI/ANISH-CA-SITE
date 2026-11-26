@@ -4,6 +4,7 @@ import {
   Play, Linkedin, Instagram, Youtube, Send, ShieldCheck, FileCheck2, Receipt,
   Building2, Landmark, Calculator, Briefcase, Store, Factory, Home, Cpu, Layers,
   Users, BadgeCheck, Wallet, Timer, Lock, Headphones, Wrench, Maximize2,
+  Download, FileText,
   LineChart as LineChartIcon,
 } from "lucide-react";
 import portraitImg from "./portrait.webp";
@@ -258,6 +259,45 @@ const TOOLS = [
   // },
 ];
 
+/* ---------------------------------------------------------------------------
+   DOWNLOADS — files shared from Google Drive.
+
+   TO ADD A FILE:
+   1. In Google Drive: right-click the file → Share → General access →
+      "Anyone with the link". Copy the link.
+   2. Add one entry below. Paste the normal Drive share link as-is — it is
+      converted to a direct download automatically.
+   Entries whose url is "#" are hidden; if none are real, the whole section
+   (and its menu item) is hidden.
+--------------------------------------------------------------------------- */
+const DOWNLOADS = [
+  {
+    t: "File Search Manager",
+    d: "Excel tool to search and organise files on your computer. Folder includes the .xlsm file and a PDF user guide.",
+    tag: "Excel + PDF",
+    url: "https://drive.google.com/drive/folders/17IvCjccLypt1Ii5hAcJkBDbg8LxkD8eF?usp=drive_link",
+  },
+  {
+    t: "InstaFS — Non-Corporate Entities (V5)",
+    d: "Excel template to prepare financial statements of non-corporate entities in the ICAI format.",
+    tag: "ZIP",
+    url: "https://drive.google.com/file/d/1yDPhvskDjGNyge65pwDrIjy_vohkSCjh/view?usp=drive_link",
+  },
+  {
+    t: "InstaFS — Schedule III",
+    d: "Excel template to prepare company financial statements as per Schedule III of the Companies Act, 2013.",
+    tag: "ZIP",
+    url: "https://drive.google.com/file/d/1DCKuW9Ruc2PVwcZ81czMWDsCb6CLhoKR/view?usp=drive_link",
+  },
+];
+
+/* Turns a Drive share link (…/file/d/ID/view or ?id=ID) into a direct download link. */
+const driveDownload = (url) => {
+  const m = url.match(/\/file\/d\/([\w-]+)/) || url.match(/[?&]id=([\w-]+)/);
+  return m && !url.includes("/folders/") ? `https://drive.usercontent.google.com/download?id=${m[1]}&export=download&confirm=t` : url;
+};
+const DOWNLOAD_ITEMS = DOWNLOADS.filter((f) => f.url && f.url !== "#");
+
 /* Social links — set to "#" to hide that icon automatically. */
 const SOCIALS = [
   [Linkedin, "https://www.linkedin.com/in/anish-choudhary-764956133", "LinkedIn"],
@@ -321,7 +361,7 @@ export default function Site() {
     } catch { setStatus("error"); }
   };
 
-  const nav = [["Home", "top"], ["About", "about"], ["Services", "services"], ["Tools", "tools"], ["Insights", "insights"], ["Contact", "contact"]];
+  const nav = [["Home", "top"], ["About", "about"], ["Services", "services"], ["Tools", "tools"], ...(DOWNLOAD_ITEMS.length ? [["Downloads", "downloads"]] : []), ["Insights", "insights"], ["Contact", "contact"]];
 
   return (
     <div className="site">
@@ -807,6 +847,48 @@ export default function Site() {
           </Reveal>
         </div>
       </section>
+
+      {/* ================= DOWNLOADS ================= */}
+      {DOWNLOAD_ITEMS.length > 0 && (
+      <section id="downloads" className="sec rule-b">
+        <div className="wrap">
+          <Reveal><div className="t-eyebrow text-center">Downloads</div></Reveal>
+          <Reveal delay={70}>
+            <h2 className="t-h2 text-center" style={{ marginTop: 16 }}>Free Resources.</h2>
+          </Reveal>
+          <Reveal delay={120}>
+            <p className="t-body text-center" style={{ maxWidth: "54ch", margin: "20px auto 0" }}>
+              Checklists and reference material you can download and keep.
+            </p>
+          </Reveal>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3" style={{ gap: 16, marginTop: 56 }}>
+            {DOWNLOAD_ITEMS.map((f, i) => (
+              <Reveal key={f.t + i} delay={(i % 3) * 80}>
+                <a href={driveDownload(f.url)} target="_blank" rel="noreferrer" className="card card-i h-full flex flex-col" style={{ padding: "28px 28px 24px" }}>
+                  <div className="flex items-start justify-between" style={{ gap: 16 }}>
+                    <span className="plate plate-lg" style={{ flexShrink: 0 }}>
+                      <FileText size={19} strokeWidth={1.6} style={{ color: GOLD }} />
+                    </span>
+                    {f.tag && (
+                      <span className="mono" style={{
+                        fontSize: 9.5, letterSpacing: ".18em", textTransform: "uppercase",
+                        color: "var(--mute)", border: "1px solid var(--line)", borderRadius: 999, padding: "5px 11px",
+                      }}>{f.tag}</span>
+                    )}
+                  </div>
+                  <h3 className="t-h3" style={{ fontSize: "1.0625rem", marginTop: 20 }}>{f.t}</h3>
+                  {f.d && <p className="t-sm" style={{ marginTop: 10, flex: 1 }}>{f.d}</p>}
+                  <span className="go" style={{ marginTop: 22 }}>
+                    {f.url.includes("/folders/") ? "Open folder" : "Download"} <Download size={13} strokeWidth={2} />
+                  </span>
+                </a>
+              </Reveal>
+            ))}
+          </div>
+        </div>
+      </section>
+      )}
 
       {/* ================= INSIGHTS ================= */}
       {INSIGHT_TABS.length > 0 && (
